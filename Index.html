@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Portfolio</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #070b14;
+    color: white;
+    min-height: 100vh;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: 45px 45px;
+}
+
+nav {
+    min-height: 75px;
+    padding: 0 7%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(7,11,20,.9);
+    border-bottom: 1px solid #202b40;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.logo span {
+    color: #00e5ff;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+}
+
+.nav-links a {
+    color: #b8c2d9;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.nav-links a:hover {
+    color: #00e5ff;
+}
+
+.hero {
+    width: 90%;
+    max-width: 1200px;
+    min-height: 750px;
+    margin: auto;
+    padding: 80px 0;
+    display: flex;
+    align-items: center;
+    gap: 70px;
+}
+
+.profile-area {
+    width: 40%;
+    display: flex;
+    justify-content: center;
+}
+
+.profile-placeholder,
+.profile-picture {
+    width: 380px;
+    height: 440px;
+    border-radius: 50%;
+    border: 3px solid #00e5ff;
+    box-shadow:
+        0 0 30px rgba(0,229,255,.25),
+        0 0 70px rgba(0,229,255,.08);
+}
+
+.profile-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #526078;
+    background: radial-gradient(circle, #17243a, #0b101b 70%);
+}
+
+.profile-picture {
+    object-fit: cover;
+}
+
+.hero-content {
+    width: 60%;
+}
+
+.small-title {
+    color: #00e5ff;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    margin-bottom: 15px;
+}
+
+h1 {
+    font-size: 58px;
+    line-height: 1.05;
+    margin-bottom: 8px;
+}
+
+h1 span {
+    color: #00e5ff;
+}
+
+.course {
+    color: #8896b0;
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.about-card {
+    margin-top: 10px;
+    padding: 22px;
+    background: rgba(19,28,44,.75);
+    border: 1px solid #263750;
+    border-radius: 14px;
+    color: #aeb9ca;
+    line-height: 1.7;
+}
+
+.section-label {
+    color: #00e5ff;
+    font-size: 11px;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+}
+
+.edit-box {
+    margin-top: 20px;
+    padding: 25px;
+    background: rgba(19,28,44,.75);
+    border: 1px solid #263750;
+    border-radius: 16px;
+}
+
+label {
+    display: block;
+    color: #8391a9;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+input[type="text"],
+textarea {
+    width: 100%;
+    background: #080d17;
+    color: white;
+    border: 1px solid #2b3a54;
+    border-radius: 8px;
+    padding: 13px;
+    margin-bottom: 18px;
+    outline: none;
+    font-size: 15px;
+}
+
+textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+input[type="file"] {
+    color: #8794aa;
+    max-width: 100%;
+}
+
+button {
+    border: none;
+    padding: 12px 23px;
+    margin-top: 10px;
+    border-radius: 7px;
+    background: #00e5ff;
+    color: #061019;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+.clear {
+    background: #273247;
+    color: white;
+    margin-left: 8px;
+}
+
+@media(max-width:850px) {
+    nav {
+        padding: 20px;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .nav-links {
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .hero {
+        flex-direction: column;
+        text-align: center;
+        padding-top: 50px;
+    }
+
+    .profile-area,
+    .hero-content {
+        width: 100%;
+    }
+
+    .profile-placeholder,
+    .profile-picture {
+        width: 300px;
+        height: 360px;
+    }
+
+    h1 {
+        font-size: 42px;
+    }
+
+    .about-card {
+        text-align: left;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+    <div class="logo">
+        <span>&lt;</span> MY PORTFOLIO <span>/&gt;</span>
+    </div>
+
+    <ul class="nav-links">
+        <li><a href="index.html">HOME</a></li>
+        <li><a href="quiz.html">QUIZ</a></li>
+        <li><a href="laboratory.html">LABORATORY</a></li>
+        <li><a href="exam.html">EXAM</a></li>
+    </ul>
+</nav>
+
+<section class="hero">
+
+    <div class="profile-area">
+        <div id="profileContainer">
+            <div class="profile-placeholder">
+                PROFILE<br>PHOTO
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-content">
+
+        <div class="small-title">
+            STUDENT PORTFOLIO
+        </div>
+
+        <h1>
+            HI, I'M <span id="nameDisplay"></span>
+        </h1>
+
+        <div class="course">
+            BSIT-3B
+        </div>
+
+        <div class="about-card" id="about" style="display:none;">
+
+            <div class="section-label">
+                ABOUT ME
+            </div>
+
+            <p id="aboutDisplay"></p>
+
+            <button class="clear" onclick="clearProfile()">
+                CLEAR
+            </button>
+
+        </div>
+
+        <div class="edit-box" id="editBox">
+
+            <label>YOUR NAME</label>
+
+            <input
+                type="text"
+                id="nameInput"
+                placeholder="Enter your name"
+            >
+
+            <label>ABOUT ME</label>
+
+            <textarea
+                id="aboutInput"
+                placeholder="Write something about yourself..."
+            ></textarea>
+
+            <label>PROFILE PICTURE</label>
+
+            <input
+                type="file"
+                id="profileInput"
+                accept="image/*"
+            >
+
+            <br>
+
+            <button onclick="submitProfile()">
+                SAVE PROFILE
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+<script>
+function submitProfile() {
+
+    const name =
+        document.getElementById("nameInput").value.trim();
+
+    const about =
+        document.getElementById("aboutInput").value.trim();
+
+    const image =
+        document.getElementById("profileInput").files[0];
+
+    if (!name || !about || !image) {
+        alert("Please enter your name, About Me, and profile picture.");
+        return;
+    }
+
+    document.getElementById("nameDisplay").textContent = name;
+    document.getElementById("aboutDisplay").textContent = about;
+
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+
+        localStorage.setItem(
+            "profileImage",
+            event.target.result
+        );
+
+        document.getElementById("profileContainer").innerHTML = `
+            <img
+                class="profile-picture"
+                src="${event.target.result}"
+                alt="Profile Picture"
+            >
+        `;
+    };
+
+    reader.readAsDataURL(image);
+
+    localStorage.setItem("profileName", name);
+    localStorage.setItem("profileAbout", about);
+
+    document.getElementById("editBox").style.display = "none";
+    document.getElementById("about").style.display = "block";
+}
+
+function clearProfile() {
+
+    localStorage.removeItem("profileName");
+    localStorage.removeItem("profileAbout");
+    localStorage.removeItem("profileImage");
+
+    document.getElementById("nameDisplay").textContent = "";
+    document.getElementById("aboutDisplay").textContent = "";
+
+    document.getElementById("nameInput").value = "";
+    document.getElementById("aboutInput").value = "";
+    document.getElementById("profileInput").value = "";
+
+    document.getElementById("editBox").style.display = "block";
+    document.getElementById("about").style.display = "none";
+
+    document.getElementById("profileContainer").innerHTML = `
+        <div class="profile-placeholder">
+            PROFILE<br>PHOTO
+        </div>
+    `;
+}
+
+window.onload = function() {
+
+    const name = localStorage.getItem("profileName");
+    const about = localStorage.getItem("profileAbout");
+    const image = localStorage.getItem("profileImage");
+
+    if (name && about && image) {
+
+        document.getElementById("nameDisplay").textContent = name;
+        document.getElementById("aboutDisplay").textContent = about;
+
+        document.getElementById("profileContainer").innerHTML = `
+            <img
+                class="profile-picture"
+                src="${image}"
+                alt="Profile Picture"
+            >
+        `;
+
+        document.getElementById("editBox").style.display = "none";
+        document.getElementById("about").style.display = "block";
+    }
+};
+</script>
+
+</body>
+</html>
