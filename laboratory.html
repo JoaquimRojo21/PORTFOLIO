@@ -1,103 +1,523 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PDF Storage in IndexedDB</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PDF Storage | My Portfolio</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #070b14;
+            color: white;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-image:
+                linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+            background-size: 45px 45px;
+        }
+
+        nav {
+            min-height: 75px;
+            padding: 0 7%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(7,11,20,.95);
+            border-bottom: 1px solid #202b40;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .logo span {
+            color: #00e5ff;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: #b8c2d9;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .nav-links a:hover {
+            color: #00e5ff;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 70px auto 120px;
+        }
+
+        .label {
+            color: #00e5ff;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 55px;
+            margin-bottom: 35px;
+        }
+
+        h1 span {
+            color: #00e5ff;
+        }
+
+        .upload-card,
+        .pdf-card,
+        .viewer-card {
+            background: rgba(19, 28, 44, .75);
+            border: 1px solid #263750;
+            border-radius: 18px;
+            padding: 35px;
+        }
+
+        .upload-card {
+            margin-bottom: 50px;
+        }
+
+        .upload-card p,
+        .viewer-card p {
+            color: #9ca8bd;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 13px 22px;
+            background: #111b2c;
+            border: 1px solid #31435e;
+            border-radius: 8px;
+            color: #b9c6d9;
+            cursor: pointer;
+        }
+
+        .file-label:hover {
+            border-color: #00e5ff;
+            color: #00e5ff;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        button {
+            border: none;
+            padding: 13px 23px;
+            margin-left: 8px;
+            border-radius: 7px;
+            background: #00e5ff;
+            color: #061019;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .selected-file {
+            margin-top: 20px;
+            color: #72829c;
+            font-size: 13px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-header h2 {
+            font-size: 22px;
+        }
+
+        .count {
+            color: #00e5ff;
+            font-size: 13px;
+        }
+
+        .pdf-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 25px;
+        }
+
+        .pdf-card {
+            min-height: 250px;
+        }
+
+        .pdf-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .pdf-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 12px;
+            background: #111b2c;
+            border: 1px solid #263750;
+            border-radius: 10px;
+            color: #c4cee0;
+            font-size: 14px;
+        }
+
+        .pdf-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .view-btn {
+            margin: 0;
+            padding: 9px 14px;
+            flex-shrink: 0;
+        }
+
+        .empty {
+            color: #8896b0;
+            font-size: 16px;
+            padding: 20px 0;
+        }
+
+        .viewer-card {
+            min-height: 650px;
+        }
+
+        #pdfViewer {
+            width: 100%;
+            height: 570px;
+            border: 1px solid #31435e;
+            border-radius: 10px;
+            background: #080d17;
+        }
+
+        @media (max-width: 900px) {
+            .pdf-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 650px) {
+            nav {
+                padding: 20px;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-links {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            h1 {
+                font-size: 42px;
+            }
+
+            .upload-card,
+            .pdf-card,
+            .viewer-card {
+                padding: 25px;
+            }
+
+            button {
+                margin-top: 10px;
+            }
+
+            .pdf-card li {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .view-btn {
+                margin-top: 0;
+            }
+
+            #pdfViewer {
+                height: 500px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<h2>Upload PDF</h2>
-<input type="file" id="fileInput" accept="application/pdf" />
-<button onclick="saveSelectedPDF()">Save PDF</button>
+    <nav>
+        <div class="logo">
+            <span>&lt;</span> MY PORTFOLIO <span>/&gt;</span>
+        </div>
 
-<h2>Stored PDFs</h2>
-<ul id="pdfList"></ul>
+        <ul class="nav-links">
+            <li><a href="index.html">HOME</a></li>
+            <li><a href="quiz.html">QUIZ</a></li>
+            <li><a href="laboratory.html">LABORATORY</a></li>
+            <li><a href="exam.html">EXAM</a></li>
+        </ul>
+    </nav>
 
-<h2>View PDF</h2>
-<embed id="pdfViewer" width="600" height="800" type="application/pdf" />
+    <div class="container">
 
-<script>
-// Define IndexedDB variables
-const DB_NAME = 'pdfStore';
-const STORE_NAME = 'pdfs';
-let db;
+        <div class="label">
+            ACADEMIC WORK
+        </div>
 
-// Open (or create) database
-const request = indexedDB.open(DB_NAME, 1);
+        <h1>
+            <span>PDF</span> STORAGE
+        </h1>
 
-request.onupgradeneeded = function(event) {
-    db = event.target.result;
-    if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
-    }
-};
+        <div class="upload-card">
+            <p>
+                Upload and store your academic PDF files directly in your browser.
+            </p>
 
-request.onsuccess = function(event) {
-    db = event.target.result;
-    displayPDFList();
-};
+            <label for="fileInput" class="file-label">
+                + CHOOSE PDF
+            </label>
 
-request.onerror = function(event) {
-    console.error("Database error:", event.target.error);
-}
+            <input
+                type="file"
+                id="fileInput"
+                accept="application/pdf"
+            >
 
-// Save selected PDF file into IndexedDB
-function saveSelectedPDF() {
-    const fileInput = document.getElementById('fileInput');
-    const file = fileInput.files[0];
-    if (!file || file.type !== 'application/pdf') {
-        alert('Please select a PDF file.');
-        return;
-    }
-    const transaction = db.transaction(STORE_NAME, 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-    store.add({ file: file, name: file.name, type: file.type });
-    transaction.oncomplete = () => {
-        alert('PDF saved!');
-        displayPDFList();
-    };
-    transaction.onerror = () => {
-        alert('Error saving PDF.');
-    };
-}
+            <button onclick="saveSelectedPDF()">
+                SAVE PDF
+            </button>
 
-// Display list of saved PDFs
-function displayPDFList() {
-    const list = document.getElementById('pdfList');
-    list.innerHTML = '';
+            <div class="selected-file" id="selectedFile">
+                No PDF selected.
+            </div>
+        </div>
 
-    const transaction = db.transaction(STORE_NAME, 'readonly');
-    const store = transaction.objectStore(STORE_NAME);
-    store.openCursor().onsuccess = function(event) {
-        const cursor = event.target.result;
-        if (cursor) {
-            const li = document.createElement('li');
-            li.textContent = cursor.value.name;
-            const viewBtn = document.createElement('button');
-            viewBtn.textContent = 'View';
-            viewBtn.onclick = () => loadAndDisplayPDF(cursor.key);
-            li.appendChild(viewBtn);
-            list.appendChild(li);
-            cursor.continue();
+        <div class="pdf-layout">
+
+            <div class="pdf-card">
+                <div class="section-header">
+                    <h2>Stored PDFs</h2>
+                    <div class="count" id="pdfCount">0 files</div>
+                </div>
+
+                <ul class="pdf-list" id="pdfList">
+                    <li class="empty">
+                        No PDFs stored yet.
+                    </li>
+                </ul>
+            </div>
+
+            <div class="viewer-card">
+                <div class="section-header">
+                    <h2>PDF Viewer</h2>
+                </div>
+
+                <p id="viewerMessage">
+                    Select a PDF from the list to view it.
+                </p>
+
+                <embed
+                    id="pdfViewer"
+                    type="application/pdf"
+                >
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        const DB_NAME = "pdfStore";
+        const STORE_NAME = "pdfs";
+        let db;
+
+        const fileInput = document.getElementById("fileInput");
+        const selectedFile = document.getElementById("selectedFile");
+
+        fileInput.addEventListener("change", function () {
+            if (fileInput.files.length === 0) {
+                selectedFile.textContent = "No PDF selected.";
+                return;
+            }
+
+            selectedFile.textContent =
+                fileInput.files[0].name + " selected.";
+        });
+
+        const request = indexedDB.open(DB_NAME, 1);
+
+        request.onupgradeneeded = function (event) {
+            db = event.target.result;
+
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME, {
+                    keyPath: "id",
+                    autoIncrement: true
+                });
+            }
+        };
+
+        request.onsuccess = function (event) {
+            db = event.target.result;
+            displayPDFList();
+        };
+
+        request.onerror = function (event) {
+            console.error("Database error:", event.target.error);
+        };
+
+        function saveSelectedPDF() {
+            const file = fileInput.files[0];
+
+            if (!file || file.type !== "application/pdf") {
+                alert("Please select a PDF file.");
+                return;
+            }
+
+            const transaction = db.transaction(
+                STORE_NAME,
+                "readwrite"
+            );
+
+            const store = transaction.objectStore(STORE_NAME);
+
+            store.add({
+                file: file,
+                name: file.name,
+                type: file.type,
+                date: new Date().toISOString()
+            });
+
+            transaction.oncomplete = function () {
+                selectedFile.textContent =
+                    "PDF saved successfully.";
+
+                fileInput.value = "";
+                displayPDFList();
+            };
+
+            transaction.onerror = function () {
+                alert("Error saving PDF.");
+            };
         }
-    };
-}
 
-// Load PDF by ID and display
-function loadAndDisplayPDF(id) {
-    const transaction = db.transaction(STORE_NAME, 'readonly');
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.get(id);
-    request.onsuccess = function() {
-        const item = request.result;
-        if (item && item.file) {
-            const url = URL.createObjectURL(item.file);
-            document.getElementById('pdfViewer').src = url;
+        function displayPDFList() {
+            const list = document.getElementById("pdfList");
+            const count = document.getElementById("pdfCount");
+
+            list.innerHTML = "";
+
+            const transaction = db.transaction(
+                STORE_NAME,
+                "readonly"
+            );
+
+            const store = transaction.objectStore(STORE_NAME);
+            const items = [];
+
+            store.openCursor().onsuccess = function (event) {
+                const cursor = event.target.result;
+
+                if (cursor) {
+                    items.push({
+                        id: cursor.key,
+                        data: cursor.value
+                    });
+
+                    cursor.continue();
+                } else {
+                    count.textContent =
+                        items.length +
+                        (items.length === 1 ? " file" : " files");
+
+                    if (items.length === 0) {
+                        list.innerHTML = `
+                            <li class="empty">
+                                No PDFs stored yet.
+                            </li>
+                        `;
+                        return;
+                    }
+
+                    items.forEach(function (item) {
+                        const li = document.createElement("li");
+
+                        const name = document.createElement("span");
+                        name.className = "pdf-name";
+                        name.textContent = item.data.name;
+
+                        const viewButton =
+                            document.createElement("button");
+
+                        viewButton.className = "view-btn";
+                        viewButton.textContent = "VIEW";
+                        viewButton.onclick = function () {
+                            loadAndDisplayPDF(item.id);
+                        };
+
+                        li.appendChild(name);
+                        li.appendChild(viewButton);
+                        list.appendChild(li);
+                    });
+                }
+            };
         }
-    };
-}
-</script>
+
+        function loadAndDisplayPDF(id) {
+            const transaction = db.transaction(
+                STORE_NAME,
+                "readonly"
+            );
+
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.get(id);
+
+            request.onsuccess = function () {
+                const item = request.result;
+
+                if (item && item.file) {
+                    const url = URL.createObjectURL(item.file);
+
+                    document.getElementById("pdfViewer").src = url;
+                    document.getElementById("viewerMessage").textContent =
+                        "Currently viewing: " + item.name;
+                }
+            };
+        }
+    </script>
 
 </body>
 </html>
