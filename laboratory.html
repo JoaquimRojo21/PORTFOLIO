@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Laboratory | My Portfolio</title>
 
 <style>
@@ -123,7 +123,7 @@ h1 span {
     color: #00e5ff;
 }
 
-#imageInput {
+#fileInput {
     display: none;
 }
 
@@ -177,24 +177,27 @@ button:hover {
     min-height: 80px;
 }
 
-.image-card {
+.pdf-card {
     background: rgba(19,28,44,.75);
     border: 1px solid #263750;
     border-radius: 15px;
     padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.image-card img {
+.pdf-view {
     width: 100%;
     height: 300px;
-    object-fit: contain;
     background: #080d17;
     border-radius: 10px;
+    margin-bottom: 10px;
 }
 
 .delete-btn {
     width: 100%;
-    margin: 10px 0 0;
+    margin-top: 10px;
 }
 
 .empty {
@@ -269,19 +272,18 @@ button:hover {
 
     <div class="upload-card">
 
-
-        <label for="imageInput" class="file-label">
-            + CHOOSE IMAGES
+        <label for="fileInput" class="file-label">
+            + CHOOSE PDFs
         </label>
 
         <input
             type="file"
-            id="imageInput"
-            accept="image/*"
+            id="fileInput"
+            accept="application/pdf"
             multiple
         >
 
-        <button onclick="addImages()">
+        <button onclick="addFiles()">
             ADD SUBMISSION
         </button>
 
@@ -290,7 +292,7 @@ button:hover {
         </button>
 
         <div class="selected-files" id="selectedFiles">
-            No images selected.
+            No PDFs selected.
         </div>
 
     </div>
@@ -301,8 +303,8 @@ button:hover {
             My Laboratory Submissions
         </h2>
 
-        <div class="count" id="imageCount">
-            0 images
+        <div class="count" id="fileCount">
+            0 PDFs
         </div>
 
     </div>
@@ -317,18 +319,15 @@ button:hover {
 
 <script>
 const DB_NAME = "MyPortfolioDB";
-const STORE_NAME = "laboratoryImages";
+const STORE_NAME = "laboratoryPDFs";
 
 let db;
 
 const request = indexedDB.open(DB_NAME, 4);
 
 request.onupgradeneeded = function(event) {
-
     db = event.target.result;
-
     if (!db.objectStoreNames.contains(STORE_NAME)) {
-
         db.createObjectStore(
             STORE_NAME,
             {
@@ -340,184 +339,119 @@ request.onupgradeneeded = function(event) {
 };
 
 request.onsuccess = function(event) {
-
     db = event.target.result;
-    loadImages();
+    loadPDFs();
 };
 
 request.onerror = function() {
     console.log("Database could not be opened.");
 };
 
-document.getElementById("imageInput")
+document.getElementById("fileInput")
 .addEventListener("change", function() {
-
     const files = this.files;
     const selected =
         document.getElementById("selectedFiles");
-
     if (files.length > 0) {
         selected.textContent =
-            files.length + " image(s) selected.";
+            files.length + " PDF(s) selected.";
     } else {
         selected.textContent =
-            "No images selected.";
+            "No PDFs selected.";
     }
 });
 
-function addImages() {
-
-    const input =
-        document.getElementById("imageInput");
-
+function addFiles() {
+    const input = document.getElementById("fileInput");
     const files = input.files;
 
     if (files.length === 0) {
-        alert("Please choose images first.");
+        alert("Please choose PDFs first.");
         return;
     }
 
-    const transaction =
-        db.transaction([STORE_NAME], "readwrite");
-
-    const store =
-        transaction.objectStore(STORE_NAME);
+    const transaction = db.transaction([STORE_NAME], "readwrite");
+    const store = transaction.objectStore(STORE_NAME);
 
     for (const file of files) {
-
-        if (file.type.startsWith("image/")) {
-
+        if (file.type === "application/pdf") {
             store.add({
                 name: file.name,
                 type: file.type,
-                image: file
+                file: file
             });
         }
     }
 
     transaction.oncomplete = function() {
-
         input.value = "";
-
-        document.getElementById("selectedFiles")
-        .textContent =
-            "Images added successfully.";
-
-        loadImages();
+        document.getElementById("selectedFiles").textContent = "PDFs added successfully.";
+        loadPDFs();
     };
 }
 
-function loadImages() {
-
-    if (!db) {
-        return;
-    }
-
-    const transaction =
-        db.transaction([STORE_NAME], "readonly");
-
-    const store =
-        transaction.objectStore(STORE_NAME);
-
-    const request =
-        store.getAll();
+function loadPDFs() {
+    if (!db) return;
+    const transaction = db.transaction([STORE_NAME], "readonly");
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.getAll();
 
     request.onsuccess = function() {
-        displayImages(request.result);
+        displayPDFs(request.result);
     };
 }
 
-function displayImages(images) {
-
-    const gallery =
-        document.getElementById("gallery");
-
-    const count =
-        document.getElementById("imageCount");
-
-    count.textContent =
-        images.length +
-        (images.length === 1 ? " image" : " images");
-
+function displayPDFs(pdfs) {
+    const gallery = document.getElementById("gallery");
+    const count = document.getElementById("fileCount");
+    count.textContent = pdfs.length + (pdfs.length === 1 ? " PDF" : " PDFs");
     gallery.innerHTML = "";
 
-    if (images.length === 0) {
-
-        gallery.innerHTML = `
-            <div class="empty">
-                No submission yet.
-            </div>
-        `;
-
+    if (pdfs.length === 0) {
+        gallery.innerHTML = `<div class="empty">No submission yet.</div>`;
         return;
     }
 
-    images.forEach(function(item) {
+    pdfs.forEach(function(item) {
+        const card = document.createElement("div");
+        card.className = "pdf-card";
 
-        const card =
-            document.createElement("div");
+        // Embed PDF
+        const embed = document.createElement("embed");
+        embed.src = URL.createObjectURL(item.file);
+        embed.type = "application/pdf";
+        embed.className = "pdf-view";
 
-        card.className = "image-card";
-
-        const img =
-            document.createElement("img");
-
-        img.src =
-            URL.createObjectURL(item.image);
-
-        img.alt = item.name;
-
-        const button =
-            document.createElement("button");
-
+        const button = document.createElement("button");
         button.className = "delete-btn";
         button.textContent = "DELETE";
 
         button.onclick = function() {
-            deleteImage(item.id);
+            deletePDF(item.id);
         };
 
-        card.appendChild(img);
+        card.appendChild(embed);
         card.appendChild(button);
-
         gallery.appendChild(card);
     });
 }
 
-function deleteImage(id) {
-
-    if (!confirm("Delete this laboratory submission?")) {
-        return;
-    }
-
-    const transaction =
-        db.transaction([STORE_NAME], "readwrite");
-
+function deletePDF(id) {
+    if (!confirm("Delete this submission?")) return;
+    const transaction = db.transaction([STORE_NAME], "readwrite");
     transaction.objectStore(STORE_NAME).delete(id);
-
     transaction.oncomplete = function() {
-        loadImages();
+        loadPDFs();
     };
 }
 
 function clearAll() {
-
-    if (!confirm("Delete ALL laboratory submissions?")) {
-        return;
-    }
-
-    const transaction =
-        db.transaction([STORE_NAME], "readwrite");
-
+    if (!confirm("Delete ALL submissions?")) return;
+    const transaction = db.transaction([STORE_NAME], "readwrite");
     transaction.objectStore(STORE_NAME).clear();
-
     transaction.oncomplete = function() {
-
-        document.getElementById("selectedFiles")
-        .textContent =
-            "No images selected.";
-
-        loadImages();
+        document.getElementById("selectedFiles").textContent = "No PDFs selected.";
+        loadPDFs();
     };
 }
 </script>
