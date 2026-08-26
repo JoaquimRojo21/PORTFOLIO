@@ -3,455 +3,98 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Laboratory | My Portfolio</title>
-
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background: #070b14;
-    color: white;
-    min-height: 100vh;
-}
-
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-    background-size: 45px 45px;
-}
-
-nav {
-    min-height: 75px;
-    padding: 0 7%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(7,11,20,.95);
-    border-bottom: 1px solid #202b40;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-.logo {
-    font-size: 20px;
-    font-weight: bold;
-    letter-spacing: 2px;
-}
-
-.logo span {
-    color: #00e5ff;
-}
-
-.nav-links {
-    display: flex;
-    list-style: none;
-    gap: 30px;
-}
-
-.nav-links a {
-    color: #b8c2d9;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
-
-.nav-links a:hover {
-    color: #00e5ff;
-}
-
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 70px auto 120px;
-}
-
-.label {
-    color: #00e5ff;
-    font-size: 12px;
-    font-weight: bold;
-    letter-spacing: 4px;
-    margin-bottom: 12px;
-}
-
-h1 {
-    font-size: 55px;
-    margin-bottom: 35px;
-}
-
-h1 span {
-    color: #00e5ff;
-}
-
-.upload-card {
-    background: rgba(19,28,44,.75);
-    border: 1px solid #263750;
-    border-radius: 18px;
-    padding: 35px;
-    margin-bottom: 50px;
-}
-
-.upload-card p {
-    color: #9ca8bd;
-    line-height: 1.7;
-    margin-bottom: 20px;
-}
-
-.file-label {
-    display: inline-block;
-    padding: 13px 22px;
-    background: #111b2c;
-    border: 1px solid #31435e;
-    border-radius: 8px;
-    color: #b9c6d9;
-    cursor: pointer;
-}
-
-.file-label:hover {
-    border-color: #00e5ff;
-    color: #00e5ff;
-}
-
-#fileInput {
-    display: none;
-}
-
-button {
-    border: none;
-    padding: 13px 23px;
-    margin-left: 8px;
-    border-radius: 7px;
-    background: #00e5ff;
-    color: #061019;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-button:hover {
-    transform: translateY(-2px);
-}
-
-.clear-all,
-.delete-btn {
-    background: #273247;
-    color: white;
-}
-
-.selected-files {
-    margin-top: 20px;
-    color: #72829c;
-    font-size: 13px;
-}
-
-.gallery-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-}
-
-.gallery-header h2 {
-    font-size: 22px;
-}
-
-.count {
-    color: #00e5ff;
-    font-size: 13px;
-}
-
-.gallery {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 25px;
-    min-height: 80px;
-}
-
-.pdf-card {
-    background: rgba(19,28,44,.75);
-    border: 1px solid #263750;
-    border-radius: 15px;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.pdf-view {
-    width: 100%;
-    height: 300px;
-    background: #080d17;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-
-.delete-btn {
-    width: 100%;
-    margin-top: 10px;
-}
-
-.empty {
-    grid-column: 1 / -1;
-    padding: 20px 0;
-    color: #8896b0;
-    font-size: 16px;
-}
-
-@media(max-width:900px) {
-    .gallery {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media(max-width:650px) {
-    nav {
-        padding: 20px;
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .nav-links {
-        gap: 15px;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    h1 {
-        font-size: 42px;
-    }
-
-    .gallery {
-        grid-template-columns: 1fr;
-    }
-
-    .upload-card {
-        padding: 25px;
-    }
-
-    button {
-        margin-top: 10px;
-    }
-}
-</style>
+<title>PDF Storage in IndexedDB</title>
 </head>
-
 <body>
 
-<nav>
-    <div class="logo">
-        <span>&lt;</span> MY PORTFOLIO <span>/&gt;</span>
-    </div>
+<h2>Upload PDF</h2>
+<input type="file" id="fileInput" accept="application/pdf" />
+<button onclick="saveSelectedPDF()">Save PDF</button>
 
-    <ul class="nav-links">
-        <li><a href="index.html">HOME</a></li>
-        <li><a href="quiz.html">QUIZ</a></li>
-        <li><a href="laboratory.html">LABORATORY</a></li>
-        <li><a href="exam.html">EXAM</a></li>
-    </ul>
-</nav>
+<h2>Stored PDFs</h2>
+<ul id="pdfList"></ul>
 
-<div class="container">
-
-    <div class="label">
-        ACADEMIC WORK
-    </div>
-
-    <h1>
-        <span>LABORATORY</span>
-    </h1>
-
-    <div class="upload-card">
-
-        <label for="fileInput" class="file-label">
-            + CHOOSE PDFs
-        </label>
-
-        <input
-            type="file"
-            id="fileInput"
-            accept="application/pdf"
-            multiple
-        >
-
-        <button onclick="addFiles()">
-            ADD SUBMISSION
-        </button>
-
-        <button class="clear-all" onclick="clearAll()">
-            CLEAR ALL
-        </button>
-
-        <div class="selected-files" id="selectedFiles">
-            No PDFs selected.
-        </div>
-
-    </div>
-
-    <div class="gallery-header">
-
-        <h2>
-            My Laboratory Submissions
-        </h2>
-
-        <div class="count" id="fileCount">
-            0 PDFs
-        </div>
-
-    </div>
-
-    <div class="gallery" id="gallery">
-        <div class="empty">
-            No submission yet.
-        </div>
-    </div>
-
-</div>
+<h2>View PDF</h2>
+<embed id="pdfViewer" width="600" height="800" type="application/pdf" />
 
 <script>
-const DB_NAME = "MyPortfolioDB";
-const STORE_NAME = "laboratoryPDFs";
-
+// Define IndexedDB variables
+const DB_NAME = 'pdfStore';
+const STORE_NAME = 'pdfs';
 let db;
 
-const request = indexedDB.open(DB_NAME, 4);
+// Open (or create) database
+const request = indexedDB.open(DB_NAME, 1);
 
 request.onupgradeneeded = function(event) {
     db = event.target.result;
     if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(
-            STORE_NAME,
-            {
-                keyPath: "id",
-                autoIncrement: true
-            }
-        );
+        db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
     }
 };
 
 request.onsuccess = function(event) {
     db = event.target.result;
-    loadPDFs();
+    displayPDFList();
 };
 
-request.onerror = function() {
-    console.log("Database could not be opened.");
-};
+request.onerror = function(event) {
+    console.error("Database error:", event.target.error);
+}
 
-document.getElementById("fileInput")
-.addEventListener("change", function() {
-    const files = this.files;
-    const selected =
-        document.getElementById("selectedFiles");
-    if (files.length > 0) {
-        selected.textContent =
-            files.length + " PDF(s) selected.";
-    } else {
-        selected.textContent =
-            "No PDFs selected.";
-    }
-});
-
-function addFiles() {
-    const input = document.getElementById("fileInput");
-    const files = input.files;
-
-    if (files.length === 0) {
-        alert("Please choose PDFs first.");
+// Save selected PDF file into IndexedDB
+function saveSelectedPDF() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    if (!file || file.type !== 'application/pdf') {
+        alert('Please select a PDF file.');
         return;
     }
-
-    const transaction = db.transaction([STORE_NAME], "readwrite");
+    const transaction = db.transaction(STORE_NAME, 'readwrite');
     const store = transaction.objectStore(STORE_NAME);
+    store.add({ file: file, name: file.name, type: file.type });
+    transaction.oncomplete = () => {
+        alert('PDF saved!');
+        displayPDFList();
+    };
+    transaction.onerror = () => {
+        alert('Error saving PDF.');
+    };
+}
 
-    for (const file of files) {
-        if (file.type === "application/pdf") {
-            store.add({
-                name: file.name,
-                type: file.type,
-                file: file
-            });
+// Display list of saved PDFs
+function displayPDFList() {
+    const list = document.getElementById('pdfList');
+    list.innerHTML = '';
+
+    const transaction = db.transaction(STORE_NAME, 'readonly');
+    const store = transaction.objectStore(STORE_NAME);
+    store.openCursor().onsuccess = function(event) {
+        const cursor = event.target.result;
+        if (cursor) {
+            const li = document.createElement('li');
+            li.textContent = cursor.value.name;
+            const viewBtn = document.createElement('button');
+            viewBtn.textContent = 'View';
+            viewBtn.onclick = () => loadAndDisplayPDF(cursor.key);
+            li.appendChild(viewBtn);
+            list.appendChild(li);
+            cursor.continue();
         }
-    }
-
-    transaction.oncomplete = function() {
-        input.value = "";
-        document.getElementById("selectedFiles").textContent = "PDFs added successfully.";
-        loadPDFs();
     };
 }
 
-function loadPDFs() {
-    if (!db) return;
-    const transaction = db.transaction([STORE_NAME], "readonly");
+// Load PDF by ID and display
+function loadAndDisplayPDF(id) {
+    const transaction = db.transaction(STORE_NAME, 'readonly');
     const store = transaction.objectStore(STORE_NAME);
-    const request = store.getAll();
-
+    const request = store.get(id);
     request.onsuccess = function() {
-        displayPDFs(request.result);
-    };
-}
-
-function displayPDFs(pdfs) {
-    const gallery = document.getElementById("gallery");
-    const count = document.getElementById("fileCount");
-    count.textContent = pdfs.length + (pdfs.length === 1 ? " PDF" : " PDFs");
-    gallery.innerHTML = "";
-
-    if (pdfs.length === 0) {
-        gallery.innerHTML = `<div class="empty">No submission yet.</div>`;
-        return;
-    }
-
-    pdfs.forEach(function(item) {
-        const card = document.createElement("div");
-        card.className = "pdf-card";
-
-        // Embed PDF
-        const embed = document.createElement("embed");
-        embed.src = URL.createObjectURL(item.file);
-        embed.type = "application/pdf";
-        embed.className = "pdf-view";
-
-        const button = document.createElement("button");
-        button.className = "delete-btn";
-        button.textContent = "DELETE";
-
-        button.onclick = function() {
-            deletePDF(item.id);
-        };
-
-        card.appendChild(embed);
-        card.appendChild(button);
-        gallery.appendChild(card);
-    });
-}
-
-function deletePDF(id) {
-    if (!confirm("Delete this submission?")) return;
-    const transaction = db.transaction([STORE_NAME], "readwrite");
-    transaction.objectStore(STORE_NAME).delete(id);
-    transaction.oncomplete = function() {
-        loadPDFs();
-    };
-}
-
-function clearAll() {
-    if (!confirm("Delete ALL submissions?")) return;
-    const transaction = db.transaction([STORE_NAME], "readwrite");
-    transaction.objectStore(STORE_NAME).clear();
-    transaction.oncomplete = function() {
-        document.getElementById("selectedFiles").textContent = "No PDFs selected.";
-        loadPDFs();
+        const item = request.result;
+        if (item && item.file) {
+            const url = URL.createObjectURL(item.file);
+            document.getElementById('pdfViewer').src = url;
+        }
     };
 }
 </script>
