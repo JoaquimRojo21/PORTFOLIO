@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>PDF Storage | My Portfolio</title>
 
     <style>
+        /* Your existing styles here ... (unchanged) */
         * {
             margin: 0;
             padding: 0;
@@ -227,6 +228,8 @@
             background: #080d17;
         }
 
+        /* Responsive styles omitted for brevity, same as in your original code ... */
+
         @media (max-width: 900px) {
             .pdf-layout {
                 grid-template-columns: 1fr;
@@ -275,14 +278,11 @@
         }
     </style>
 </head>
-
 <body>
-
     <nav>
         <div class="logo">
             <span>&lt;</span> MY PORTFOLIO <span>/&gt;</span>
         </div>
-
         <ul class="nav-links">
             <li><a href="index.html">HOME</a></li>
             <li><a href="quiz.html">QUIZ</a></li>
@@ -292,7 +292,6 @@
     </nav>
 
     <div class="container">
-
         <div class="label">
             ACADEMIC WORK
         </div>
@@ -305,34 +304,28 @@
             <p>
                 Upload and store your academic PDF files directly in your browser.
             </p>
-
             <label for="fileInput" class="file-label">
                 + CHOOSE PDF
             </label>
-
             <input
                 type="file"
                 id="fileInput"
                 accept="application/pdf"
             >
-
             <button onclick="saveSelectedPDF()">
                 SAVE PDF
             </button>
-
             <div class="selected-file" id="selectedFile">
                 No PDF selected.
             </div>
         </div>
 
         <div class="pdf-layout">
-
             <div class="pdf-card">
                 <div class="section-header">
                     <h2>Stored PDFs</h2>
                     <div class="count" id="pdfCount">0 files</div>
                 </div>
-
                 <ul class="pdf-list" id="pdfList">
                     <li class="empty">
                         No PDFs stored yet.
@@ -344,19 +337,21 @@
                 <div class="section-header">
                     <h2>PDF Viewer</h2>
                 </div>
-
                 <p id="viewerMessage">
                     Select a PDF from the list to view it.
                 </p>
-
                 <embed
                     id="pdfViewer"
                     type="application/pdf"
                 >
             </div>
-
         </div>
 
+        <!-- New section for direct link to the specific PDF -->
+        <div style="margin-top:40px; padding:20px; background:#111b2c; border-radius:10px; border:1px solid #263750;">
+            <h3 style="color:#00e5ff;">Download Rojo Elective Lab 1 PDF</h3>
+            <a href="ROJO-ELECTIVE-LAB1.pdf" target="_blank" style="color:#b8c2d9; font-size:16px;">Click here to view or download the PDF</a>
+        </div>
     </div>
 
     <script>
@@ -372,7 +367,6 @@
                 selectedFile.textContent = "No PDF selected.";
                 return;
             }
-
             selectedFile.textContent =
                 fileInput.files[0].name + " selected.";
         });
@@ -381,7 +375,6 @@
 
         request.onupgradeneeded = function (event) {
             db = event.target.result;
-
             if (!db.objectStoreNames.contains(STORE_NAME)) {
                 db.createObjectStore(STORE_NAME, {
                     keyPath: "id",
@@ -401,34 +394,23 @@
 
         function saveSelectedPDF() {
             const file = fileInput.files[0];
-
             if (!file || file.type !== "application/pdf") {
                 alert("Please select a PDF file.");
                 return;
             }
-
-            const transaction = db.transaction(
-                STORE_NAME,
-                "readwrite"
-            );
-
+            const transaction = db.transaction(STORE_NAME, "readwrite");
             const store = transaction.objectStore(STORE_NAME);
-
             store.add({
                 file: file,
                 name: file.name,
                 type: file.type,
                 date: new Date().toISOString()
             });
-
             transaction.oncomplete = function () {
-                selectedFile.textContent =
-                    "PDF saved successfully.";
-
+                selectedFile.textContent = "PDF saved successfully.";
                 fileInput.value = "";
                 displayPDFList();
             };
-
             transaction.onerror = function () {
                 alert("Error saving PDF.");
             };
@@ -437,32 +419,22 @@
         function displayPDFList() {
             const list = document.getElementById("pdfList");
             const count = document.getElementById("pdfCount");
-
             list.innerHTML = "";
-
-            const transaction = db.transaction(
-                STORE_NAME,
-                "readonly"
-            );
-
+            const transaction = db.transaction(STORE_NAME, "readonly");
             const store = transaction.objectStore(STORE_NAME);
             const items = [];
-
             store.openCursor().onsuccess = function (event) {
                 const cursor = event.target.result;
-
                 if (cursor) {
                     items.push({
                         id: cursor.key,
                         data: cursor.value
                     });
-
                     cursor.continue();
                 } else {
                     count.textContent =
                         items.length +
                         (items.length === 1 ? " file" : " files");
-
                     if (items.length === 0) {
                         list.innerHTML = `
                             <li class="empty">
@@ -471,23 +443,17 @@
                         `;
                         return;
                     }
-
                     items.forEach(function (item) {
                         const li = document.createElement("li");
-
                         const name = document.createElement("span");
                         name.className = "pdf-name";
                         name.textContent = item.data.name;
-
-                        const viewButton =
-                            document.createElement("button");
-
+                        const viewButton = document.createElement("button");
                         viewButton.className = "view-btn";
                         viewButton.textContent = "VIEW";
                         viewButton.onclick = function () {
                             loadAndDisplayPDF(item.id);
                         };
-
                         li.appendChild(name);
                         li.appendChild(viewButton);
                         list.appendChild(li);
@@ -497,27 +463,37 @@
         }
 
         function loadAndDisplayPDF(id) {
-            const transaction = db.transaction(
-                STORE_NAME,
-                "readonly"
-            );
-
+            const transaction = db.transaction(STORE_NAME, "readonly");
             const store = transaction.objectStore(STORE_NAME);
             const request = store.get(id);
-
             request.onsuccess = function () {
                 const item = request.result;
-
                 if (item && item.file) {
                     const url = URL.createObjectURL(item.file);
-
                     document.getElementById("pdfViewer").src = url;
                     document.getElementById("viewerMessage").textContent =
                         "Currently viewing: " + item.name;
                 }
             };
         }
-    </script>
 
+        // Optional: Load the specific PDF into IndexedDB on page load
+        // Uncomment and run once if needed
+        /*
+        fetch('ROJO-ELECTIVE-LAB1.pdf')
+          .then(response => response.blob())
+          .then(blob => {
+            const transaction = db.transaction(STORE_NAME, 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            store.add({
+              file: blob,
+              name: 'ROJO-ELECTIVE-LAB1.pdf',
+              type: 'application/pdf',
+              date: new Date().toISOString()
+            });
+          })
+          .catch(console.error);
+        */
+    </script>
 </body>
 </html>
