@@ -157,65 +157,6 @@ h1 span {
     margin-bottom: 10px;
 }
 
-.edit-box {
-    margin-top: 20px;
-    padding: 25px;
-    background: rgba(19,28,44,.75);
-    border: 1px solid #263750;
-    border-radius: 16px;
-}
-
-label {
-    display: block;
-    color: #8391a9;
-    font-size: 13px;
-    margin-bottom: 8px;
-}
-
-input[type="text"],
-textarea {
-    width: 100%;
-    background: #080d17;
-    color: white;
-    border: 1px solid #2b3a54;
-    border-radius: 8px;
-    padding: 13px;
-    margin-bottom: 18px;
-    outline: none;
-    font-size: 15px;
-}
-
-textarea {
-    height: 120px;
-    resize: vertical;
-}
-
-input[type="file"] {
-    color: #8794aa;
-    max-width: 100%;
-}
-
-button {
-    border: none;
-    padding: 12px 23px;
-    margin-top: 10px;
-    border-radius: 7px;
-    background: #00e5ff;
-    color: #061019;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-button:hover {
-    transform: translateY(-2px);
-}
-
-.clear {
-    background: #273247;
-    color: white;
-    margin-left: 8px;
-}
-
 @media(max-width:850px) {
     nav {
         padding: 20px;
@@ -275,10 +216,14 @@ button:hover {
 <section class="hero">
 
     <div class="profile-area">
-        <div id="profileContainer">
-            <div class="profile-placeholder">
-                PROFILE<br>PHOTO
-            </div>
+        <!--
+            To use your own photo:
+            1. Upload your photo file (e.g. "profile.jpg") to the same GitHub folder as this index.html.
+            2. Replace the <div class="profile-placeholder">...</div> block below with:
+               <img class="profile-picture" src="profile.jpg" alt="Profile Picture">
+        -->
+        <div class="profile-placeholder">
+            PROFILE<br>PHOTO
         </div>
     </div>
 
@@ -289,158 +234,28 @@ button:hover {
         </div>
 
         <h1>
-            HI, I'M <span id="nameDisplay"></span>
+            HI, I'M <span>JOAQUIM</span>
         </h1>
 
         <div class="course">
             BSIT-3B
         </div>
 
-        <div class="about-card" id="about" style="display:none;">
+        <div class="about-card">
 
             <div class="section-label">
                 ABOUT ME
             </div>
 
-            <p id="aboutDisplay"></p>
-
-            <button class="clear" onclick="clearProfile()">
-                CLEAR
-            </button>
-
-        </div>
-
-        <div class="edit-box" id="editBox">
-
-            <label>YOUR NAME</label>
-
-            <input
-                type="text"
-                id="nameInput"
-                placeholder="Enter your name"
-            >
-
-            <label>ABOUT ME</label>
-
-            <textarea
-                id="aboutInput"
-                placeholder="Write something about yourself..."
-            ></textarea>
-
-            <label>PROFILE PICTURE</label>
-
-            <input
-                type="file"
-                id="profileInput"
-                accept="image/*"
-            >
-
-            <br>
-
-            <button onclick="submitProfile()">
-                SAVE PROFILE
-            </button>
+            <p>
+                Joaquim Inigo L. Rojo — I am a third-year Information Technology student at Philippine Christian University. I am dedicated to improving my programming and coding skills while focusing on my studies and preparing for my future career. My goal is to successfully complete my degree, continue developing my technical abilities, and achieve my aspirations in the field of technology.
+            </p>
 
         </div>
 
     </div>
 
 </section>
-
-<script>
-function submitProfile() {
-
-    const name =
-        document.getElementById("nameInput").value.trim();
-
-    const about =
-        document.getElementById("aboutInput").value.trim();
-
-    const image =
-        document.getElementById("profileInput").files[0];
-
-    if (!name || !about || !image) {
-        alert("Please enter your name, About Me, and profile picture.");
-        return;
-    }
-
-    document.getElementById("nameDisplay").textContent = name;
-    document.getElementById("aboutDisplay").textContent = about;
-
-    const reader = new FileReader();
-
-    reader.onload = function(event) {
-
-        localStorage.setItem(
-            "profileImage",
-            event.target.result
-        );
-
-        document.getElementById("profileContainer").innerHTML = `
-            <img
-                class="profile-picture"
-                src="${event.target.result}"
-                alt="Profile Picture"
-            >
-        `;
-    };
-
-    reader.readAsDataURL(image);
-
-    localStorage.setItem("profileName", name);
-    localStorage.setItem("profileAbout", about);
-
-    document.getElementById("editBox").style.display = "none";
-    document.getElementById("about").style.display = "block";
-}
-
-function clearProfile() {
-
-    localStorage.removeItem("profileName");
-    localStorage.removeItem("profileAbout");
-    localStorage.removeItem("profileImage");
-
-    document.getElementById("nameDisplay").textContent = "";
-    document.getElementById("aboutDisplay").textContent = "";
-
-    document.getElementById("nameInput").value = "";
-    document.getElementById("aboutInput").value = "";
-    document.getElementById("profileInput").value = "";
-
-    document.getElementById("editBox").style.display = "block";
-    document.getElementById("about").style.display = "none";
-
-    document.getElementById("profileContainer").innerHTML = `
-        <div class="profile-placeholder">
-            PROFILE<br>PHOTO
-        </div>
-    `;
-}
-
-window.onload = function() {
-
-    const name = localStorage.getItem("profileName");
-    const about = localStorage.getItem("profileAbout");
-    const image = localStorage.getItem("profileImage");
-
-    if (name && about && image) {
-
-        document.getElementById("nameDisplay").textContent = name;
-        document.getElementById("aboutDisplay").textContent = about;
-
-        document.getElementById("profileContainer").innerHTML = `
-            <img
-                class="profile-picture"
-                src="${image}"
-                alt="Profile Picture"
-            >
-        `;
-
-        document.getElementById("editBox").style.display = "none";
-        document.getElementById("about").style.display = "block";
-    }
-};
-</script>
 
 </body>
 </html>
