@@ -91,6 +91,66 @@ h1 span {
     color: #00e5ff;
 }
 
+.upload-card {
+    background: rgba(19,28,44,.75);
+    border: 1px solid #263750;
+    border-radius: 18px;
+    padding: 35px;
+    margin-bottom: 50px;
+}
+
+.upload-card p {
+    color: #9ca8bd;
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+.file-label {
+    display: inline-block;
+    padding: 13px 22px;
+    background: #111b2c;
+    border: 1px solid #31435e;
+    border-radius: 8px;
+    color: #b9c6d9;
+    cursor: pointer;
+}
+
+.file-label:hover {
+    border-color: #00e5ff;
+    color: #00e5ff;
+}
+
+#imageInput {
+    display: none;
+}
+
+button {
+    border: none;
+    padding: 13px 23px;
+    margin-left: 8px;
+    border-radius: 7px;
+    background: #00e5ff;
+    color: #061019;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+.clear-all,
+.delete-btn {
+    background: #273247;
+    color: white;
+}
+
+.selected-files {
+    margin-top: 20px;
+    color: #72829c;
+    font-size: 13px;
+}
+
 .gallery-header {
     display: flex;
     justify-content: space-between;
@@ -129,11 +189,9 @@ h1 span {
     border-radius: 10px;
 }
 
-.image-card .caption {
-    margin-top: 10px;
-    text-align: center;
-    color: #8896b0;
-    font-size: 13px;
+.delete-btn {
+    width: 100%;
+    margin: 10px 0 0;
 }
 
 .empty {
@@ -169,6 +227,14 @@ h1 span {
     .gallery {
         grid-template-columns: 1fr;
     }
+
+    .upload-card {
+        padding: 25px;
+    }
+
+    button {
+        margin-top: 10px;
+    }
 }
 </style>
 </head>
@@ -198,64 +264,258 @@ h1 span {
         <span>QUIZ</span>
     </h1>
 
+    <div class="upload-card">
+
+
+        <label for="imageInput" class="file-label">
+            + CHOOSE IMAGES
+        </label>
+
+        <input
+            type="file"
+            id="imageInput"
+            accept="image/*"
+            multiple
+        >
+
+        <button onclick="addImages()">
+            ADD SUBMISSION
+        </button>
+
+        <button class="clear-all" onclick="clearAll()">
+            CLEAR ALL
+        </button>
+
+        <div class="selected-files" id="selectedFiles">
+            No images selected.
+        </div>
+
+    </div>
+
     <div class="gallery-header">
-        <h2>My Quiz Submissions</h2>
-        <div class="count" id="imageCount">0 images</div>
+
+        <h2>
+            My Quiz Submissions
+        </h2>
+
+        <div class="count" id="imageCount">
+            0 images
+        </div>
+
     </div>
 
     <div class="gallery" id="gallery">
-        <div class="empty">No submissions yet.</div>
+        <div class="empty">
+            No submission yet.
+        </div>
     </div>
 
 </div>
 
 <script>
-/*
-  HOW TO ADD YOUR QUIZ IMAGES:
-  1. Upload your image files into a folder called "quiz-images" inside this
-     same GitHub repo (next to this quiz.html file).
-  2. Add each filename to the list below, with an optional caption.
-  3. Commit / push to GitHub — the images will show for every visitor.
-*/
-const quizImages = [
-    // { file: "quiz-images/quiz1.jpg", caption: "Quiz 1 - Chapter 2" },
-    // { file: "quiz-images/quiz2.jpg", caption: "Quiz 2 - Chapter 3" },
-];
+const STORAGE_KEY = "quizSubmissions";
 
-function displayImages() {
-    const gallery = document.getElementById("gallery");
-    const count = document.getElementById("imageCount");
+const input =
+    document.getElementById("imageInput");
 
-    count.textContent =
-        quizImages.length +
-        (quizImages.length === 1 ? " image" : " images");
+const selectedFiles =
+    document.getElementById("selectedFiles");
 
-    gallery.innerHTML = "";
+input.addEventListener("change", function() {
 
-    if (quizImages.length === 0) {
-        gallery.innerHTML = `<div class="empty">No submissions yet.</div>`;
+    if (input.files.length === 0) {
+
+        selectedFiles.textContent =
+            "No images selected.";
+
         return;
     }
 
-    quizImages.forEach(function (item) {
-        const card = document.createElement("div");
-        card.className = "image-card";
+    selectedFiles.textContent =
+        input.files.length +
+        " image(s) selected.";
+});
 
-        const img = document.createElement("img");
-        img.src = item.file;
-        img.alt = item.caption || "Quiz submission";
+function getImages() {
+
+    const saved =
+        localStorage.getItem(STORAGE_KEY);
+
+    if (!saved) {
+        return [];
+    }
+
+    try {
+        return JSON.parse(saved);
+    } catch {
+        return [];
+    }
+}
+
+function saveImages(images) {
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(images)
+    );
+}
+
+function addImages() {
+
+    if (input.files.length === 0) {
+
+        alert("Please choose an image first.");
+
+        return;
+    }
+
+    const files =
+        Array.from(input.files);
+
+    let images =
+        getImages();
+
+    let remaining =
+        files.length;
+
+    files.forEach(function(file) {
+
+        if (!file.type.startsWith("image/")) {
+
+            remaining--;
+
+            return;
+        }
+
+        const reader =
+            new FileReader();
+
+        reader.onload = function(event) {
+
+            images.push({
+                name: file.name,
+                image: event.target.result
+            });
+
+            remaining--;
+
+            if (remaining === 0) {
+
+                saveImages(images);
+
+                input.value = "";
+
+                selectedFiles.textContent =
+                    "Images added successfully.";
+
+                displayImages();
+            }
+        };
+
+        reader.readAsDataURL(file);
+    });
+}
+
+function displayImages() {
+
+    const gallery =
+        document.getElementById("gallery");
+
+    const count =
+        document.getElementById("imageCount");
+
+    const images =
+        getImages();
+
+    count.textContent =
+        images.length +
+        (images.length === 1
+            ? " image"
+            : " images");
+
+    gallery.innerHTML = "";
+
+    if (images.length === 0) {
+
+        gallery.innerHTML = `
+            <div class="empty">
+                No submission yet.
+            </div>
+        `;
+
+        return;
+    }
+
+    images.forEach(function(item, index) {
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "image-card";
+
+        const img =
+            document.createElement("img");
+
+        img.src =
+            item.image;
+
+        img.alt =
+            item.name;
+
+        const button =
+            document.createElement("button");
+
+        button.className =
+            "delete-btn";
+
+        button.textContent =
+            "DELETE";
+
+        button.onclick =
+            function() {
+
+                deleteImage(index);
+            };
 
         card.appendChild(img);
 
-        if (item.caption) {
-            const caption = document.createElement("div");
-            caption.className = "caption";
-            caption.textContent = item.caption;
-            card.appendChild(caption);
-        }
+        card.appendChild(button);
 
         gallery.appendChild(card);
     });
+}
+
+function deleteImage(index) {
+
+    const images =
+        getImages();
+
+    images.splice(index, 1);
+
+    saveImages(images);
+
+    displayImages();
+}
+
+function clearAll() {
+
+    if (
+        !confirm(
+            "Delete ALL quiz submissions?"
+        )
+    ) {
+        return;
+    }
+
+    localStorage.removeItem(
+        STORAGE_KEY
+    );
+
+    displayImages();
+
+    selectedFiles.textContent =
+        "No images selected.";
 }
 
 displayImages();
