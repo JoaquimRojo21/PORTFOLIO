@@ -7,7 +7,6 @@
     <title>PDF Storage | My Portfolio</title>
 
     <style>
-        /* Your existing styles here ... (unchanged) */
         * {
             margin: 0;
             padding: 0;
@@ -176,7 +175,7 @@
         }
 
         .pdf-card {
-            min-height: 250px;
+            min-height: 650px;
         }
 
         .pdf-list {
@@ -228,8 +227,6 @@
             background: #080d17;
         }
 
-        /* Responsive styles omitted for brevity, same as in your original code ... */
-
         @media (max-width: 900px) {
             .pdf-layout {
                 grid-template-columns: 1fr;
@@ -278,222 +275,728 @@
         }
     </style>
 </head>
+
 <body>
+
+    <!-- NAVIGATION -->
     <nav>
         <div class="logo">
             <span>&lt;</span> MY PORTFOLIO <span>/&gt;</span>
         </div>
+
         <ul class="nav-links">
-            <li><a href="index.html">HOME</a></li>
-            <li><a href="quiz.html">QUIZ</a></li>
-            <li><a href="laboratory.html">LABORATORY</a></li>
-            <li><a href="exam.html">EXAM</a></li>
+            <li>
+                <a href="index.html">HOME</a>
+            </li>
+
+            <li>
+                <a href="quiz.html">QUIZ</a>
+            </li>
+
+            <!-- This says LABORATORY -->
+            <li>
+                <a href="pdf-storage.html">LABORATORY</a>
+            </li>
+
+            <li>
+                <a href="exam.html">EXAM</a>
+            </li>
         </ul>
     </nav>
 
+
+    <!-- MAIN CONTENT -->
     <div class="container">
+
         <div class="label">
             ACADEMIC WORK
         </div>
 
+        <!-- Page title stays PDF STORAGE -->
         <h1>
-            <span>PDF</span> STORAGE
+            <span>LABORATORY</span>
         </h1>
 
+
+        <!-- UPLOAD SECTION -->
         <div class="upload-card">
+
             <p>
                 Upload and store your academic PDF files directly in your browser.
             </p>
+
             <label for="fileInput" class="file-label">
                 + CHOOSE PDF
             </label>
+
             <input
                 type="file"
                 id="fileInput"
                 accept="application/pdf"
             >
+
             <button onclick="saveSelectedPDF()">
                 SAVE PDF
             </button>
+
             <div class="selected-file" id="selectedFile">
                 No PDF selected.
             </div>
+
         </div>
 
+
+        <!-- PDF STORAGE + VIEWER -->
         <div class="pdf-layout">
+
+            <!-- STORED PDFS -->
             <div class="pdf-card">
+
                 <div class="section-header">
                     <h2>Stored PDFs</h2>
-                    <div class="count" id="pdfCount">0 files</div>
+
+                    <div class="count" id="pdfCount">
+                        0 files
+                    </div>
                 </div>
+
                 <ul class="pdf-list" id="pdfList">
+
                     <li class="empty">
-                        No PDFs stored yet.
+                        Loading PDFs...
                     </li>
+
                 </ul>
+
             </div>
 
+
+            <!-- PDF VIEWER -->
             <div class="viewer-card">
+
                 <div class="section-header">
                     <h2>PDF Viewer</h2>
                 </div>
+
                 <p id="viewerMessage">
                     Select a PDF from the list to view it.
                 </p>
+
                 <embed
                     id="pdfViewer"
                     type="application/pdf"
                 >
+
             </div>
+
         </div>
 
-        <!-- New section for direct link to the specific PDF -->
-        <div style="margin-top:40px; padding:20px; background:#111b2c; border-radius:10px; border:1px solid #263750;">
-            <h3 style="color:#00e5ff;">Download Rojo Elective Lab 1 PDF</h3>
-            <a href="ROJO-ELECTIVE-LAB1.pdf" target="_blank" style="color:#b8c2d9; font-size:16px;">Click here to view or download the PDF</a>
-        </div>
     </div>
 
+
     <script>
+
+        // ==========================================
+        // DATABASE SETTINGS
+        // ==========================================
+
         const DB_NAME = "pdfStore";
         const STORE_NAME = "pdfs";
+
+        // Your PDF filename
+        const DEFAULT_PDF = "ROJO-ELECTIVE-LAB1.pdf";
+
         let db;
 
-        const fileInput = document.getElementById("fileInput");
-        const selectedFile = document.getElementById("selectedFile");
+
+        const fileInput =
+            document.getElementById("fileInput");
+
+        const selectedFile =
+            document.getElementById("selectedFile");
+
+
+        // ==========================================
+        // FILE SELECTION
+        // ==========================================
 
         fileInput.addEventListener("change", function () {
+
             if (fileInput.files.length === 0) {
-                selectedFile.textContent = "No PDF selected.";
+
+                selectedFile.textContent =
+                    "No PDF selected.";
+
                 return;
             }
+
+            const file = fileInput.files[0];
+
+            if (file.type !== "application/pdf") {
+
+                selectedFile.textContent =
+                    "Please select a PDF file.";
+
+                fileInput.value = "";
+
+                return;
+            }
+
             selectedFile.textContent =
-                fileInput.files[0].name + " selected.";
+                file.name + " selected.";
+
         });
 
-        const request = indexedDB.open(DB_NAME, 1);
+
+        // ==========================================
+        // OPEN DATABASE
+        // ==========================================
+
+        const request =
+            indexedDB.open(DB_NAME, 1);
+
 
         request.onupgradeneeded = function (event) {
+
             db = event.target.result;
+
             if (!db.objectStoreNames.contains(STORE_NAME)) {
+
                 db.createObjectStore(STORE_NAME, {
                     keyPath: "id",
                     autoIncrement: true
                 });
+
             }
+
         };
 
-        request.onsuccess = function (event) {
+
+        request.onsuccess = async function (event) {
+
             db = event.target.result;
+
+            // Load existing PDFs
             displayPDFList();
+
+            // Automatically add the ROJO PDF
+            await addDefaultPDF();
+
         };
+
 
         request.onerror = function (event) {
-            console.error("Database error:", event.target.error);
+
+            console.error(
+                "Database error:",
+                event.target.error
+            );
+
         };
 
+
+        // ==========================================
+        // SAVE SELECTED PDF
+        // ==========================================
+
         function saveSelectedPDF() {
-            const file = fileInput.files[0];
-            if (!file || file.type !== "application/pdf") {
-                alert("Please select a PDF file.");
+
+            const file =
+                fileInput.files[0];
+
+            if (
+                !file ||
+                file.type !== "application/pdf"
+            ) {
+
+                alert(
+                    "Please select a PDF file."
+                );
+
                 return;
             }
-            const transaction = db.transaction(STORE_NAME, "readwrite");
-            const store = transaction.objectStore(STORE_NAME);
+
+
+            const transaction =
+                db.transaction(
+                    STORE_NAME,
+                    "readwrite"
+                );
+
+
+            const store =
+                transaction.objectStore(
+                    STORE_NAME
+                );
+
+
             store.add({
+
                 file: file,
+
                 name: file.name,
+
                 type: file.type,
+
                 date: new Date().toISOString()
+
             });
+
+
             transaction.oncomplete = function () {
-                selectedFile.textContent = "PDF saved successfully.";
+
+                selectedFile.textContent =
+                    "PDF saved successfully.";
+
                 fileInput.value = "";
+
                 displayPDFList();
+
             };
+
+
             transaction.onerror = function () {
-                alert("Error saving PDF.");
+
+                alert(
+                    "Error saving PDF."
+                );
+
             };
+
         }
+
+
+        // ==========================================
+        // ADD ROJO PDF AUTOMATICALLY
+        // ==========================================
+
+        async function addDefaultPDF() {
+
+            // Check if it is already stored
+            const exists =
+                await checkIfPDFExists(
+                    DEFAULT_PDF
+                );
+
+
+            if (exists) {
+
+                // Already stored.
+                // Open it automatically.
+                findAndOpenDefaultPDF();
+
+                return;
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(DEFAULT_PDF);
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Could not find " +
+                        DEFAULT_PDF
+                    );
+
+                }
+
+
+                const blob =
+                    await response.blob();
+
+
+                const transaction =
+                    db.transaction(
+                        STORE_NAME,
+                        "readwrite"
+                    );
+
+
+                const store =
+                    transaction.objectStore(
+                        STORE_NAME
+                    );
+
+
+                store.add({
+
+                    file: blob,
+
+                    name: DEFAULT_PDF,
+
+                    type: "application/pdf",
+
+                    date: new Date().toISOString()
+
+                });
+
+
+                transaction.oncomplete =
+                    function () {
+
+                        // Refresh PDF list
+                        displayPDFList();
+
+                        // Automatically open PDF
+                        findAndOpenDefaultPDF();
+
+                    };
+
+
+                transaction.onerror =
+                    function () {
+
+                        console.error(
+                            "Could not save default PDF."
+                        );
+
+                    };
+
+
+            } catch (error) {
+
+                console.error(
+                    "Could not load default PDF:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        // ==========================================
+        // CHECK IF PDF EXISTS
+        // ==========================================
+
+        function checkIfPDFExists(fileName) {
+
+            return new Promise(function (resolve) {
+
+                const transaction =
+                    db.transaction(
+                        STORE_NAME,
+                        "readonly"
+                    );
+
+
+                const store =
+                    transaction.objectStore(
+                        STORE_NAME
+                    );
+
+
+                const request =
+                    store.openCursor();
+
+
+                request.onsuccess =
+                    function (event) {
+
+                        const cursor =
+                            event.target.result;
+
+
+                        if (!cursor) {
+
+                            resolve(false);
+
+                            return;
+                        }
+
+
+                        if (
+                            cursor.value.name ===
+                            fileName
+                        ) {
+
+                            resolve(true);
+
+                            return;
+                        }
+
+
+                        cursor.continue();
+
+                    };
+
+
+                request.onerror = function () {
+
+                    resolve(false);
+
+                };
+
+            });
+
+        }
+
+
+        // ==========================================
+        // DISPLAY PDF LIST
+        // ==========================================
 
         function displayPDFList() {
-            const list = document.getElementById("pdfList");
-            const count = document.getElementById("pdfCount");
+
+            const list =
+                document.getElementById(
+                    "pdfList"
+                );
+
+
+            const count =
+                document.getElementById(
+                    "pdfCount"
+                );
+
+
             list.innerHTML = "";
-            const transaction = db.transaction(STORE_NAME, "readonly");
-            const store = transaction.objectStore(STORE_NAME);
+
+
+            const transaction =
+                db.transaction(
+                    STORE_NAME,
+                    "readonly"
+                );
+
+
+            const store =
+                transaction.objectStore(
+                    STORE_NAME
+                );
+
+
             const items = [];
-            store.openCursor().onsuccess = function (event) {
-                const cursor = event.target.result;
-                if (cursor) {
-                    items.push({
-                        id: cursor.key,
-                        data: cursor.value
-                    });
-                    cursor.continue();
-                } else {
-                    count.textContent =
-                        items.length +
-                        (items.length === 1 ? " file" : " files");
-                    if (items.length === 0) {
-                        list.innerHTML = `
-                            <li class="empty">
-                                No PDFs stored yet.
-                            </li>
-                        `;
+
+
+            store.openCursor().onsuccess =
+                function (event) {
+
+                    const cursor =
+                        event.target.result;
+
+
+                    if (cursor) {
+
+                        items.push({
+
+                            id: cursor.key,
+
+                            data: cursor.value
+
+                        });
+
+
+                        cursor.continue();
+
+                    } else {
+
+                        // Update file count
+                        count.textContent =
+                            items.length +
+                            (
+                                items.length === 1
+                                    ? " file"
+                                    : " files"
+                            );
+
+
+                        // No PDFs
+                        if (
+                            items.length === 0
+                        ) {
+
+                            list.innerHTML = `
+                                <li class="empty">
+                                    No PDFs stored yet.
+                                </li>
+                            `;
+
+                            return;
+                        }
+
+
+                        // Create PDF items
+                        items.forEach(
+                            function (item) {
+
+                                const li =
+                                    document.createElement(
+                                        "li"
+                                    );
+
+
+                                const name =
+                                    document.createElement(
+                                        "span"
+                                    );
+
+
+                                name.className =
+                                    "pdf-name";
+
+
+                                name.textContent =
+                                    item.data.name;
+
+
+                                const viewButton =
+                                    document.createElement(
+                                        "button"
+                                    );
+
+
+                                viewButton.className =
+                                    "view-btn";
+
+
+                                viewButton.textContent =
+                                    "VIEW";
+
+
+                                viewButton.onclick =
+                                    function () {
+
+                                        loadAndDisplayPDF(
+                                            item.id
+                                        );
+
+                                    };
+
+
+                                li.appendChild(name);
+
+                                li.appendChild(
+                                    viewButton
+                                );
+
+
+                                list.appendChild(li);
+
+                            }
+                        );
+
+                    }
+
+                };
+
+        }
+
+
+        // ==========================================
+        // FIND DEFAULT PDF
+        // ==========================================
+
+        function findAndOpenDefaultPDF() {
+
+            const transaction =
+                db.transaction(
+                    STORE_NAME,
+                    "readonly"
+                );
+
+
+            const store =
+                transaction.objectStore(
+                    STORE_NAME
+                );
+
+
+            store.openCursor().onsuccess =
+                function (event) {
+
+                    const cursor =
+                        event.target.result;
+
+
+                    if (!cursor) {
                         return;
                     }
-                    items.forEach(function (item) {
-                        const li = document.createElement("li");
-                        const name = document.createElement("span");
-                        name.className = "pdf-name";
-                        name.textContent = item.data.name;
-                        const viewButton = document.createElement("button");
-                        viewButton.className = "view-btn";
-                        viewButton.textContent = "VIEW";
-                        viewButton.onclick = function () {
-                            loadAndDisplayPDF(item.id);
-                        };
-                        li.appendChild(name);
-                        li.appendChild(viewButton);
-                        list.appendChild(li);
-                    });
-                }
-            };
+
+
+                    if (
+                        cursor.value.name ===
+                        DEFAULT_PDF
+                    ) {
+
+                        loadAndDisplayPDF(
+                            cursor.key
+                        );
+
+                        return;
+                    }
+
+
+                    cursor.continue();
+
+                };
+
         }
+
+
+        // ==========================================
+        // LOAD PDF INTO VIEWER
+        // ==========================================
 
         function loadAndDisplayPDF(id) {
-            const transaction = db.transaction(STORE_NAME, "readonly");
-            const store = transaction.objectStore(STORE_NAME);
-            const request = store.get(id);
-            request.onsuccess = function () {
-                const item = request.result;
-                if (item && item.file) {
-                    const url = URL.createObjectURL(item.file);
-                    document.getElementById("pdfViewer").src = url;
-                    document.getElementById("viewerMessage").textContent =
-                        "Currently viewing: " + item.name;
-                }
-            };
+
+            const transaction =
+                db.transaction(
+                    STORE_NAME,
+                    "readonly"
+                );
+
+
+            const store =
+                transaction.objectStore(
+                    STORE_NAME
+                );
+
+
+            const request =
+                store.get(id);
+
+
+            request.onsuccess =
+                function () {
+
+                    const item =
+                        request.result;
+
+
+                    if (
+                        item &&
+                        item.file
+                    ) {
+
+                        const url =
+                            URL.createObjectURL(
+                                item.file
+                            );
+
+
+                        document.getElementById(
+                            "pdfViewer"
+                        ).src = url;
+
+
+                        document.getElementById(
+                            "viewerMessage"
+                        ).textContent =
+                            "Currently viewing: " +
+                            item.name;
+
+                    }
+
+                };
+
         }
 
-        // Optional: Load the specific PDF into IndexedDB on page load
-        // Uncomment and run once if needed
-        /*
-        fetch('ROJO-ELECTIVE-LAB1.pdf')
-          .then(response => response.blob())
-          .then(blob => {
-            const transaction = db.transaction(STORE_NAME, 'readwrite');
-            const store = transaction.objectStore(STORE_NAME);
-            store.add({
-              file: blob,
-              name: 'ROJO-ELECTIVE-LAB1.pdf',
-              type: 'application/pdf',
-              date: new Date().toISOString()
-            });
-          })
-          .catch(console.error);
-        */
     </script>
+
 </body>
 </html>
