@@ -1,261 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Portfolio</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Portfolio</title>
 
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-body {
-    font-family: Arial, sans-serif;
-    background: #070b14;
-    color: white;
-    min-height: 100vh;
-}
+        body {
+            font-family: Arial, sans-serif;
+            background: #070b14;
+            color: white;
+            min-height: 100vh;
+        }
 
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-    background-size: 45px 45px;
-}
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-image:
+                linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+            background-size: 45px 45px;
+        }
 
-nav {
-    min-height: 75px;
-    padding: 0 7%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(7,11,20,.9);
-    border-bottom: 1px solid #202b40;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
+        nav {
+            min-height: 75px;
+            padding: 0 7%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(7,11,20,.9);
+            border-bottom: 1px solid #202b40;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
 
-.logo {
-    font-size: 20px;
-    font-weight: bold;
-    letter-spacing: 2px;
-}
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
 
-.logo span {
-    color: #00e5ff;
-}
+        .logo span {
+            color: #00e5ff;
+        }
 
-.nav-links {
-    display: flex;
-    list-style: none;
-    gap: 30px;
-}
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
 
-.nav-links a {
-    color: #b8c2d9;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
+        .nav-links a {
+            color: #b8c2d9;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
 
-.nav-links a:hover {
-    color: #00e5ff;
-}
+        .nav-links a:hover {
+            color: #00e5ff;
+        }
 
-.hero {
-    width: 90%;
-    max-width: 1200px;
-    min-height: 750px;
-    margin: auto;
-    padding: 80px 0;
-    display: flex;
-    align-items: center;
-    gap: 70px;
-}
+        .hero {
+            width: 90%;
+            max-width: 1200px;
+            min-height: 750px;
+            margin: auto;
+            padding: 80px 0;
+            display: flex;
+            align-items: center;
+            gap: 70px;
+        }
 
-.profile-area {
-    width: 40%;
-    display: flex;
-    justify-content: center;
-}
+        .profile-area {
+            width: 40%;
+            display: flex;
+            justify-content: center;
+        }
 
-.profile-placeholder,
-.profile-picture {
-    width: 380px;
-    height: 440px;
-    border-radius: 50%;
-    border: 3px solid #00e5ff;
-    box-shadow:
-        0 0 30px rgba(0,229,255,.25),
-        0 0 70px rgba(0,229,255,.08);
-}
+        /* PROFILE PICTURE */
+        .profile-picture {
+            width: 380px;
+            height: 440px;
+            border-radius: 50%;
+            border: 3px solid #00e5ff;
+            box-shadow:
+                0 0 30px rgba(0,229,255,.25),
+                0 0 70px rgba(0,229,255,.08);
+            object-fit: cover;
+            object-position: center;
+        }
 
-.profile-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: #526078;
-    background: radial-gradient(circle, #17243a, #0b101b 70%);
-}
+        .hero-content {
+            width: 60%;
+        }
 
-.profile-picture {
-    object-fit: cover;
-}
+        .small-title {
+            color: #00e5ff;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            margin-bottom: 15px;
+        }
 
-.hero-content {
-    width: 60%;
-}
+        h1 {
+            font-size: 58px;
+            line-height: 1.05;
+            margin-bottom: 8px;
+        }
 
-.small-title {
-    color: #00e5ff;
-    font-size: 13px;
-    font-weight: bold;
-    letter-spacing: 4px;
-    margin-bottom: 15px;
-}
+        h1 span {
+            color: #00e5ff;
+        }
 
-h1 {
-    font-size: 58px;
-    line-height: 1.05;
-    margin-bottom: 8px;
-}
+        .course {
+            color: #8896b0;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
 
-h1 span {
-    color: #00e5ff;
-}
+        .about-card {
+            margin-top: 10px;
+            padding: 22px;
+            background: rgba(19,28,44,.75);
+            border: 1px solid #263750;
+            border-radius: 14px;
+            color: #aeb9ca;
+            line-height: 1.7;
+        }
 
-.course {
-    color: #8896b0;
-    font-size: 20px;
-    margin-bottom: 20px;
-}
+        .section-label {
+            color: #00e5ff;
+            font-size: 11px;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
 
-.about-card {
-    margin-top: 10px;
-    padding: 22px;
-    background: rgba(19,28,44,.75);
-    border: 1px solid #263750;
-    border-radius: 14px;
-    color: #aeb9ca;
-    line-height: 1.7;
-}
+        @media(max-width:850px) {
+            nav {
+                padding: 20px;
+                flex-direction: column;
+                gap: 20px;
+            }
 
-.section-label {
-    color: #00e5ff;
-    font-size: 11px;
-    letter-spacing: 3px;
-    margin-bottom: 10px;
-}
+            .nav-links {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
 
-@media(max-width:850px) {
-    nav {
-        padding: 20px;
-        flex-direction: column;
-        gap: 20px;
-    }
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding-top: 50px;
+            }
 
-    .nav-links {
-        gap: 15px;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
+            .profile-area,
+            .hero-content {
+                width: 100%;
+            }
 
-    .hero {
-        flex-direction: column;
-        text-align: center;
-        padding-top: 50px;
-    }
+            .profile-picture {
+                width: 300px;
+                height: 360px;
+            }
 
-    .profile-area,
-    .hero-content {
-        width: 100%;
-    }
+            h1 {
+                font-size: 42px;
+            }
 
-    .profile-placeholder,
-    .profile-picture {
-        width: 300px;
-        height: 360px;
-    }
-
-    h1 {
-        font-size: 42px;
-    }
-
-    .about-card {
-        text-align: left;
-    }
-}
-</style>
+            .about-card {
+                text-align: left;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<nav>
-    <div class="logo">
-        <span>&lt;</span> MY PORTFOLIO <span>/&gt;</span>
-    </div>
-
-    <ul class="nav-links">
-        <li><a href="index.html">HOME</a></li>
-        <li><a href="quiz.html">QUIZ</a></li>
-        <li><a href="laboratory.html">LABORATORY</a></li>
-        <li><a href="exam.html">EXAM</a></li>
-    </ul>
-</nav>
-
-<section class="hero">
-
-    <div class="profile-area">
-        <!--
-            To use your own photo:
-            1. Upload your photo file (e.g. "profile.jpg") to the same GitHub folder as this index.html.
-            2. Replace the <div class="profile-placeholder">...</div> block below with:
-               <img class="profile-picture" src="profile.jpg" alt="Profile Picture">
-        -->
-        <div class="profile-placeholder">
-            PROFILE<br>PHOTO
-        </div>
-    </div>
-
-    <div class="hero-content">
-
-        <div class="small-title">
-            STUDENT PORTFOLIO
+    <nav>
+        <div class="logo">
+            <span>&lt;</span> MY PORTFOLIO <span>/&gt;</span>
         </div>
 
-        <h1>
-            HI, I'M <span>JOAQUIM</span>
-        </h1>
+        <ul class="nav-links">
+            <li><a href="index.html">HOME</a></li>
+            <li><a href="quiz.html">QUIZ</a></li>
+            <li><a href="laboratory.html">LABORATORY</a></li>
+            <li><a href="exam.html">EXAM</a></li>
+        </ul>
+    </nav>
 
-        <div class="course">
-            BSIT-3B
+    <section class="hero">
+
+        <div class="profile-area">
+            <img
+                class="profile-picture"
+                src="download.jpg"
+                alt="Joaquim Profile Picture"
+            >
         </div>
 
-        <div class="about-card">
+        <div class="hero-content">
 
-            <div class="section-label">
-                ABOUT ME
+            <div class="small-title">
+                STUDENT PORTFOLIO
             </div>
 
-            <p>
-                Joaquim Inigo L. Rojo — I am a third-year Information Technology student at Philippine Christian University. I am dedicated to improving my programming and coding skills while focusing on my studies and preparing for my future career. My goal is to successfully complete my degree, continue developing my technical abilities, and achieve my aspirations in the field of technology.
-            </p>
+            <h1>
+                HI, I'M <span>JOAQUIM</span>
+            </h1>
+
+            <div class="course">
+                BSIT-3B
+            </div>
+
+            <div class="about-card">
+
+                <div class="section-label">
+                    ABOUT ME
+                </div>
+
+                <p>
+                    Joaquim Inigo L. Rojo — I am a third-year
+                    Information Technology student at Philippine
+                    Christian University. I am dedicated to improving
+                    my programming and coding skills while focusing
+                    on my studies and preparing for my future career.
+                    My goal is to successfully complete my degree,
+                    continue developing my technical abilities, and
+                    achieve my aspirations in the field of technology.
+                </p>
+
+            </div>
 
         </div>
 
-    </div>
-
-</section>
+    </section>
 
 </body>
 </html>
