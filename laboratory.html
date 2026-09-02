@@ -403,9 +403,11 @@
         const DB_NAME = "pdfStore";
         const STORE_NAME = "pdfs";
 
-        // Your PDF filename
-        const DEFAULT_PDF = "ROJO-ELECTIVE-LAB1.pdf";
-        const DEFUALT_PDF1 = "ROJO-ELECT2-LAB2.pdf";
+        // Your PDF filenames
+        const DEFAULT_PDFS = [
+            "ROJO-ELECTIVE-LAB1.pdf",
+            "ROJO-ELECT2-LAB2.pdf"
+        ];
 
         let db;
 
@@ -480,8 +482,8 @@
             // Load existing PDFs
             displayPDFList();
 
-            // Automatically add the ROJO PDF
-            await addDefaultPDF();
+            // Automatically add both default PDFs
+            await addDefaultPDFs();
 
         };
 
@@ -568,108 +570,48 @@
 
 
         // ==========================================
-        // ADD ROJO PDF AUTOMATICALLY
+        // ADD DEFAULT PDFS AUTOMATICALLY
         // ==========================================
 
-        async function addDefaultPDF() {
+        async function addDefaultPDFs() {
 
-            // Check if it is already stored
-            const exists =
-                await checkIfPDFExists(
-                    DEFAULT_PDF
-                    
-                );
+            for (const fileName of DEFAULT_PDFS) {
+                const exists = await checkIfPDFExists(fileName);
 
+                if (!exists) {
+                    try {
+                        const response = await fetch(fileName);
 
-            if (exists) {
+                        if (!response.ok) {
+                            throw new Error("Could not find " + fileName);
+                        }
 
-                // Already stored.
-                // Open it automatically.
-                findAndOpenDefaultPDF();
+                        const blob = await response.blob();
 
-                return;
-            }
+                        await new Promise((resolve, reject) => {
+                            const transaction = db.transaction(STORE_NAME, "readwrite");
+                            const store = transaction.objectStore(STORE_NAME);
 
+                            store.add({
+                                file: blob,
+                                name: fileName,
+                                type: "application/pdf",
+                                date: new Date().toISOString()
+                            });
 
-            try {
+                            transaction.oncomplete = resolve;
+                            transaction.onerror = reject;
+                        });
 
-                const response =
-                    await fetch(DEFAULT_PDF);
-                    await fetch(DEFAULT_PDF1);
-
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        "Could not find " +
-                        DEFAULT_PDF
-                        
-                    );
-
+                    } catch (error) {
+                        console.error("Could not load default PDF:", fileName, error);
+                    }
                 }
-
-
-                const blob =
-                    await response.blob();
-
-
-                const transaction =
-                    db.transaction(
-                        STORE_NAME,
-                        "readwrite"
-                    );
-
-
-                const store =
-                    transaction.objectStore(
-                        STORE_NAME
-                    );
-
-
-                store.add({
-
-                    file: blob,
-
-                    name: DEFAULT_PDF,
-
-                    type: "application/pdf",
-
-                    date: new Date().toISOString()
-                    
-
-                });
-
-
-                transaction.oncomplete =
-                    function () {
-
-                        // Refresh PDF list
-                        displayPDFList();
-
-                        // Automatically open PDF
-                        findAndOpenDefaultPDF();
-
-                    };
-
-
-                transaction.onerror =
-                    function () {
-
-                        console.error(
-                            "Could not save default PDF."
-                        );
-
-                    };
-
-
-            } catch (error) {
-
-                console.error(
-                    "Could not load default PDF:",
-                    error
-                );
-
             }
+
+            // Refresh list and open the first default PDF
+            displayPDFList();
+            findAndOpenDefaultPDF(DEFAULT_PDFS[0]);
 
         }
 
@@ -896,7 +838,7 @@
         // FIND DEFAULT PDF
         // ==========================================
 
-        function findAndOpenDefaultPDF() {
+        function findAndOpenDefaultPDF(fileName) {
 
             const transaction =
                 db.transaction(
@@ -925,7 +867,7 @@
 
                     if (
                         cursor.value.name ===
-                        DEFAULT_PDF
+                        fileName
                     ) {
 
                         loadAndDisplayPDF(
