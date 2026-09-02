@@ -1,161 +1,3 @@
-  // Your PDF filenames
-        const DEFAULT_PDFS = [
-            "ROJO-ELECTIVE-LAB1.pdf",
-            // Automatically add both default PDFs
-            await addDefaultPDFs();
-        // ADD DEFAULT PDFS AUTOMATICALLY
-        // ==========================================
-
-        async function addDefaultPDFs() {
-
-            for (const fileName of DEFAULT_PDFS) {
-                const exists = await checkIfPDFExists(fileName);
-
-                if (!exists) {
-                    try {
-                        const response = await fetch(fileName);
-
-                        if (!response.ok) {
-                            throw new Error("Could not find " + fileName);
-                        }
-
-                        const blob = await response.blob();
-
-                        await new Promise((resolve, reject) => {
-                            const transaction = db.transaction(STORE_NAME, "readwrite");
-                            const store = transaction.objectStore(STORE_NAME);
-
-                            store.add({
-                                file: blob,
-                                name: fileName,
-                                type: "application/pdf",
-                                date: new Date().toISOString()
-                            });
-
-                            transaction.oncomplete = resolve;
-                            transaction.onerror = reject;
-                        });
-
-                    } catch (error) {
-                        console.error("Could not load default PDF:", fileName, error);
-                    }
-                }
-            }
-
-            // Refresh list and open the first default PDF
-            displayPDFList();
-            findAndOpenDefaultPDF(DEFAULT_PDFS[0]);
-        function findAndOpenDefaultPDF(fileName) {
-
-            const transaction =
-                db.transaction(
-                    STORE_NAME,
-                    "readonly"
-                );
-
-
-            const store =
-                transaction.objectStore(
-                    STORE_NAME
-                );
-
-
-            store.openCursor().onsuccess =
-                function (event) {
-
-                    const cursor =
-                        event.target.result;
-
-
-                    if (!cursor) {
-                        return;
-                    }
-
-
-                    if (
-                        cursor.value.name ===
-                        fileName
-                    ) {
-
-                        loadAndDisplayPDF(
-                            cursor.key
-                        );
-
-                        return;
-                    }
-
-
-                    cursor.continue();
-
-                };
-
-        }
-
-
-        // ==========================================
-        // LOAD PDF INTO VIEWER
-        // ==========================================
-
-        function loadAndDisplayPDF(id) {
-
-            const transaction =
-                db.transaction(
-                    STORE_NAME,
-                    "readonly"
-                );
-
-
-            const store =
-                transaction.objectStore(
-                    STORE_NAME
-                );
-
-
-            const request =
-                store.get(id);
-
-
-            request.onsuccess =
-                function () {
-
-                    const item =
-                        request.result;
-
-
-                    if (
-                        item &&
-                        item.file
-                    ) {
-
-                        const url =
-                            URL.createObjectURL(
-                                item.file
-                            );
-
-
-                        document.getElementById(
-                            "pdfViewer"
-                        ).src = url;
-
-
-                        document.getElementById(
-                            "viewerMessage"
-                        ).textContent =
-                            "Currently viewing: " +
-                            item.name;
-
-                    }
-
-                };
-
-        }
-
-    </script>
-
-</body>
-</html>
-
-On Wed, Sep 2, 2026, 17:24 Joaquim Iñigo L. Rojo <jilrojo@pcu.edu.ph> wrote:
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -735,7 +577,7 @@ On Wed, Sep 2, 2026, 17:24 Joaquim Iñigo L. Rojo <jilrojo@pcu.edu.ph> wrote:
             const exists =
                 await checkIfPDFExists(
                     DEFAULT_PDF
-                   
+                    
                 );
 
 
@@ -761,7 +603,7 @@ On Wed, Sep 2, 2026, 17:24 Joaquim Iñigo L. Rojo <jilrojo@pcu.edu.ph> wrote:
                     throw new Error(
                         "Could not find " +
                         DEFAULT_PDF
-                       
+                        
                     );
 
                 }
@@ -793,7 +635,7 @@ On Wed, Sep 2, 2026, 17:24 Joaquim Iñigo L. Rojo <jilrojo@pcu.edu.ph> wrote:
                     type: "application/pdf",
 
                     date: new Date().toISOString()
-                   
+                    
 
                 });
 
