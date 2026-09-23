@@ -278,7 +278,6 @@
 
 <body>
 
-    <!-- NAVIGATION -->
     <nav>
         <div class="logo">
             <span>&lt;</span> MY PORTFOLIO <span>/&gt;</span>
@@ -293,7 +292,6 @@
                 <a href="quiz.html">QUIZ</a>
             </li>
 
-            <!-- This says LABORATORY -->
             <li>
                 <a href="pdf-storage.html">LABORATORY</a>
             </li>
@@ -304,21 +302,16 @@
         </ul>
     </nav>
 
-
-    <!-- MAIN CONTENT -->
     <div class="container">
 
         <div class="label">
             ACADEMIC WORK
         </div>
 
-        <!-- Page title stays PDF STORAGE -->
         <h1>
             <span>LABORATORY</span>
         </h1>
 
-
-        <!-- UPLOAD SECTION -->
         <div class="upload-card">
 
             <p>
@@ -345,11 +338,8 @@
 
         </div>
 
-
-        <!-- PDF STORAGE + VIEWER -->
         <div class="pdf-layout">
 
-            <!-- STORED PDFS -->
             <div class="pdf-card">
 
                 <div class="section-header">
@@ -370,8 +360,6 @@
 
             </div>
 
-
-            <!-- PDF VIEWER -->
             <div class="viewer-card">
 
                 <div class="section-header">
@@ -393,24 +381,18 @@
 
     </div>
 
-
     <script>
-
-        // ==========================================
-        // DATABASE SETTINGS
-        // ==========================================
 
         const DB_NAME = "pdfStore";
         const STORE_NAME = "pdfs";
 
-        // Your PDF filenames
         const DEFAULT_PDFS = [
             "ROJO-ELECTIVE-LAB1.pdf",
-            "ROJO-ELECT2-LAB2.pdf"
+            "ROJO-ELECT2-LAB2.pdf",
+            "ROJO-ELECT-LAB3.pdf"
         ];
 
         let db;
-
 
         const fileInput =
             document.getElementById("fileInput");
@@ -418,10 +400,6 @@
         const selectedFile =
             document.getElementById("selectedFile");
 
-
-        // ==========================================
-        // FILE SELECTION
-        // ==========================================
 
         fileInput.addEventListener("change", function () {
 
@@ -451,10 +429,6 @@
         });
 
 
-        // ==========================================
-        // OPEN DATABASE
-        // ==========================================
-
         const request =
             indexedDB.open(DB_NAME, 1);
 
@@ -479,11 +453,11 @@
 
             db = event.target.result;
 
-            // Load existing PDFs
+            await addDefaultPDFs();
+
             displayPDFList();
 
-            // Automatically add both default PDFs
-            await addDefaultPDFs();
+            findAndOpenDefaultPDF(DEFAULT_PDFS[0]);
 
         };
 
@@ -497,10 +471,6 @@
 
         };
 
-
-        // ==========================================
-        // SAVE SELECTED PDF
-        // ==========================================
 
         function saveSelectedPDF() {
 
@@ -519,19 +489,16 @@
                 return;
             }
 
-
             const transaction =
                 db.transaction(
                     STORE_NAME,
                     "readwrite"
                 );
 
-
             const store =
                 transaction.objectStore(
                     STORE_NAME
                 );
-
 
             store.add({
 
@@ -545,7 +512,6 @@
 
             });
 
-
             transaction.oncomplete = function () {
 
                 selectedFile.textContent =
@@ -556,7 +522,6 @@
                 displayPDFList();
 
             };
-
 
             transaction.onerror = function () {
 
@@ -569,56 +534,92 @@
         }
 
 
-        // ==========================================
-        // ADD DEFAULT PDFS AUTOMATICALLY
-        // ==========================================
-
         async function addDefaultPDFs() {
 
             for (const fileName of DEFAULT_PDFS) {
-                const exists = await checkIfPDFExists(fileName);
+
+                const exists =
+                    await checkIfPDFExists(fileName);
 
                 if (!exists) {
+
                     try {
-                        const response = await fetch(fileName);
+
+                        const response =
+                            await fetch(fileName);
 
                         if (!response.ok) {
-                            throw new Error("Could not find " + fileName);
+
+                            throw new Error(
+                                "Could not find " +
+                                fileName
+                            );
+
                         }
 
-                        const blob = await response.blob();
+                        const blob =
+                            await response.blob();
 
-                        await new Promise((resolve, reject) => {
-                            const transaction = db.transaction(STORE_NAME, "readwrite");
-                            const store = transaction.objectStore(STORE_NAME);
+                        await new Promise(
+                            (resolve, reject) => {
 
-                            store.add({
-                                file: blob,
-                                name: fileName,
-                                type: "application/pdf",
-                                date: new Date().toISOString()
-                            });
+                                const transaction =
+                                    db.transaction(
+                                        STORE_NAME,
+                                        "readwrite"
+                                    );
 
-                            transaction.oncomplete = resolve;
-                            transaction.onerror = reject;
-                        });
+                                const store =
+                                    transaction.objectStore(
+                                        STORE_NAME
+                                    );
 
-                    } catch (error) {
-                        console.error("Could not load default PDF:", fileName, error);
+                                store.add({
+
+                                    file: blob,
+
+                                    name: fileName,
+
+                                    type:
+                                        "application/pdf",
+
+                                    date:
+                                        new Date().toISOString()
+
+                                });
+
+                                transaction.oncomplete =
+                                    resolve;
+
+                                transaction.onerror =
+                                    reject;
+
+                            }
+                        );
+
+                        console.log(
+                            fileName +
+                            " added successfully."
+                        );
+
                     }
-                }
-            }
 
-            // Refresh list and open the first default PDF
-            displayPDFList();
-            findAndOpenDefaultPDF(DEFAULT_PDFS[0]);
+                    catch (error) {
+
+                        console.error(
+                            "Could not load default PDF:",
+                            fileName,
+                            error
+                        );
+
+                    }
+
+                }
+
+            }
 
         }
 
-
-        // ==========================================
-        // CHECK IF PDF EXISTS
-        // ==========================================
 
         function checkIfPDFExists(fileName) {
 
@@ -630,16 +631,13 @@
                         "readonly"
                     );
 
-
                 const store =
                     transaction.objectStore(
                         STORE_NAME
                     );
 
-
                 const request =
                     store.openCursor();
-
 
                 request.onsuccess =
                     function (event) {
@@ -647,14 +645,12 @@
                         const cursor =
                             event.target.result;
 
-
                         if (!cursor) {
 
                             resolve(false);
 
                             return;
                         }
-
 
                         if (
                             cursor.value.name ===
@@ -666,11 +662,9 @@
                             return;
                         }
 
-
                         cursor.continue();
 
                     };
-
 
                 request.onerror = function () {
 
@@ -683,10 +677,6 @@
         }
 
 
-        // ==========================================
-        // DISPLAY PDF LIST
-        // ==========================================
-
         function displayPDFList() {
 
             const list =
@@ -694,15 +684,12 @@
                     "pdfList"
                 );
 
-
             const count =
                 document.getElementById(
                     "pdfCount"
                 );
 
-
             list.innerHTML = "";
-
 
             const transaction =
                 db.transaction(
@@ -710,22 +697,18 @@
                     "readonly"
                 );
 
-
             const store =
                 transaction.objectStore(
                     STORE_NAME
                 );
 
-
             const items = [];
-
 
             store.openCursor().onsuccess =
                 function (event) {
 
                     const cursor =
                         event.target.result;
-
 
                     if (cursor) {
 
@@ -737,12 +720,12 @@
 
                         });
 
-
                         cursor.continue();
 
-                    } else {
+                    }
 
-                        // Update file count
+                    else {
+
                         count.textContent =
                             items.length +
                             (
@@ -751,8 +734,6 @@
                                     : " files"
                             );
 
-
-                        // No PDFs
                         if (
                             items.length === 0
                         ) {
@@ -766,8 +747,6 @@
                             return;
                         }
 
-
-                        // Create PDF items
                         items.forEach(
                             function (item) {
 
@@ -776,34 +755,27 @@
                                         "li"
                                     );
 
-
                                 const name =
                                     document.createElement(
                                         "span"
                                     );
 
-
                                 name.className =
                                     "pdf-name";
 
-
                                 name.textContent =
                                     item.data.name;
-
 
                                 const viewButton =
                                     document.createElement(
                                         "button"
                                     );
 
-
                                 viewButton.className =
                                     "view-btn";
 
-
                                 viewButton.textContent =
                                     "VIEW";
-
 
                                 viewButton.onclick =
                                     function () {
@@ -814,13 +786,11 @@
 
                                     };
 
-
                                 li.appendChild(name);
 
                                 li.appendChild(
                                     viewButton
                                 );
-
 
                                 list.appendChild(li);
 
@@ -834,10 +804,6 @@
         }
 
 
-        // ==========================================
-        // FIND DEFAULT PDF
-        // ==========================================
-
         function findAndOpenDefaultPDF(fileName) {
 
             const transaction =
@@ -846,12 +812,10 @@
                     "readonly"
                 );
 
-
             const store =
                 transaction.objectStore(
                     STORE_NAME
                 );
-
 
             store.openCursor().onsuccess =
                 function (event) {
@@ -859,11 +823,11 @@
                     const cursor =
                         event.target.result;
 
-
                     if (!cursor) {
-                        return;
-                    }
 
+                        return;
+
+                    }
 
                     if (
                         cursor.value.name ===
@@ -875,8 +839,8 @@
                         );
 
                         return;
-                    }
 
+                    }
 
                     cursor.continue();
 
@@ -884,10 +848,6 @@
 
         }
 
-
-        // ==========================================
-        // LOAD PDF INTO VIEWER
-        // ==========================================
 
         function loadAndDisplayPDF(id) {
 
@@ -897,23 +857,19 @@
                     "readonly"
                 );
 
-
             const store =
                 transaction.objectStore(
                     STORE_NAME
                 );
 
-
             const request =
                 store.get(id);
-
 
             request.onsuccess =
                 function () {
 
                     const item =
                         request.result;
-
 
                     if (
                         item &&
@@ -925,11 +881,9 @@
                                 item.file
                             );
 
-
                         document.getElementById(
                             "pdfViewer"
                         ).src = url;
-
 
                         document.getElementById(
                             "viewerMessage"
