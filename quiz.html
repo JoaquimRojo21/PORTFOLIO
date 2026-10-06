@@ -6,6 +6,7 @@
 <title>Quiz | My Portfolio</title>
 
 <style>
+/* Your existing styles... */
 * {
     margin: 0;
     padding: 0;
@@ -201,30 +202,8 @@ h2 {
     font-size: 16px;
 }
 
-/* GitHub screenshots */
-#github-images {
-    margin-top: 50px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 25px;
-}
-
-#github-images img {
-    width: 100%;
-    height: 300px;
-    object-fit: contain;
-    background: #080d17;
-    border: 1px solid #263750;
-    border-radius: 15px;
-    padding: 12px;
-}
-
 @media(max-width:900px) {
     .gallery {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    #github-images {
         grid-template-columns: repeat(2, 1fr);
     }
 }
@@ -250,10 +229,6 @@ h2 {
         grid-template-columns: 1fr;
     }
 
-    #github-images {
-        grid-template-columns: 1fr;
-    }
-
     .upload-card {
         padding: 25px;
     }
@@ -261,6 +236,15 @@ h2 {
     button {
         margin-top: 10px;
     }
+}
+
+/* Style for the shared images container */
+#github-images {
+    margin-top: 50px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
 }
 </style>
 </head>
@@ -271,7 +255,6 @@ h2 {
     <div class="logo">
         <span>&lt;</span> MY PORTFOLIO <span>/&gt;</span>
     </div>
-
     <ul class="nav-links">
         <li><a href="index.html">HOME</a></li>
         <li><a href="quiz.html">QUIZ</a></li>
@@ -291,323 +274,156 @@ h2 {
     </h1>
 
     <div class="upload-card">
-
-        <label for="imageInput" class="file-label">
-            + CHOOSE IMAGES
-        </label>
-
-        <input
-            type="file"
-            id="imageInput"
-            accept="image/*"
-            multiple
-        />
-
-        <button onclick="addImages()">
-            ADD SUBMISSION
-        </button>
-
-        <button class="clear-all" onclick="clearAll()">
-            CLEAR ALL
-        </button>
-
-        <div class="selected-files" id="selectedFiles">
-            No images selected.
-        </div>
-
+        <label for="imageInput" class="file-label">+ CHOOSE IMAGES</label>
+        <input type="file" id="imageInput" accept="image/*" multiple />
+        <button onclick="addImages()">ADD SUBMISSION</button>
+        <button class="clear-all" onclick="clearAll()">CLEAR ALL</button>
+        <div class="selected-files" id="selectedFiles">No images selected.</div>
     </div>
 
     <div class="gallery-header">
         <h2>My Quiz Submissions</h2>
-        <div class="count" id="imageCount">
-            0 images
-        </div>
+        <div class="count" id="imageCount">0 images</div>
     </div>
 
-    <!-- Uploaded images -->
     <div class="gallery" id="gallery">
-        <div class="empty">
-            No submission yet.
-        </div>
+        <div class="empty">No submission yet.</div>
     </div>
 
-    <!-- Quiz screenshots from GitHub -->
-    <div id="github-images"></div>
+    <!-- Container for sharing images from GitHub -->
+    <div id="github-images">
+        <!-- Your shared image will appear here -->
+        <img src="Screenshot 2026-08-26 141116.png" alt="Quiz Screenshot" style="width: 300px; border-radius: 8px;">
+        <img src="Screenshot 2026-10-06 201625.png" alt="Quiz Screenshot" style="width: 300px; border-radisu: 8px;">
+        <img src="Screenshot 2026-10-06 201616.png" alt="Quiz Screenshot" style="width: 300px; border-radisu: 8px;">
+        <img src="Screenshot 2026-10-06 201638.png" alt="Quiz Screenshot" style="width: 300px; border-radisu: 8px;">
+    </div>
 
 </div>
 
 <script>
-
 const STORAGE_KEY = "quizSubmissions";
 
 const input = document.getElementById("imageInput");
 const selectedFiles = document.getElementById("selectedFiles");
 
-
-// ========================================
-// FILE SELECTION
-// ========================================
-
 input.addEventListener("change", function() {
-
     if (input.files.length === 0) {
         selectedFiles.textContent = "No images selected.";
         return;
     }
-
-    selectedFiles.textContent =
-        input.files.length + " image(s) selected.";
-
+    selectedFiles.textContent = input.files.length + " image(s) selected.";
 });
 
-
-// ========================================
-// GET SAVED IMAGES
-// ========================================
-
 function getImages() {
-
     const saved = localStorage.getItem(STORAGE_KEY);
-
     if (!saved) {
         return [];
     }
-
     try {
         return JSON.parse(saved);
     } catch {
         return [];
     }
-
 }
-
-
-// ========================================
-// SAVE IMAGES
-// ========================================
 
 function saveImages(images) {
-
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(images)
-    );
-
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(images));
 }
-
-
-// ========================================
-// ADD IMAGES
-// ========================================
 
 function addImages() {
-
     if (input.files.length === 0) {
-
         alert("Please choose an image first.");
-
         return;
     }
-
     const files = Array.from(input.files);
-
     let images = getImages();
-
     let remaining = files.length;
-
     files.forEach(function(file) {
-
         if (!file.type.startsWith("image/")) {
-
             remaining--;
-
             return;
         }
-
         const reader = new FileReader();
-
         reader.onload = function(event) {
-
-            images.push({
-                name: file.name,
-                image: event.target.result
-            });
-
+            images.push({ name: file.name, image: event.target.result });
             remaining--;
-
             if (remaining === 0) {
-
                 saveImages(images);
-
                 input.value = "";
-
-                selectedFiles.textContent =
-                    "Images added successfully.";
-
+                selectedFiles.textContent = "Images added successfully.";
                 displayImages();
-
             }
-
         };
-
         reader.readAsDataURL(file);
-
     });
-
 }
-
-
-// ========================================
-// DISPLAY UPLOADED IMAGES
-// ========================================
 
 function displayImages() {
-
-    const gallery =
-        document.getElementById("gallery");
-
-    const count =
-        document.getElementById("imageCount");
-
+    const gallery = document.getElementById("gallery");
+    const count = document.getElementById("imageCount");
     const images = getImages();
-
-    count.textContent =
-        images.length +
-        (images.length === 1 ? " image" : " images");
-
+    count.textContent = images.length + (images.length === 1 ? " image" : " images");
     gallery.innerHTML = "";
-
     if (images.length === 0) {
-
-        gallery.innerHTML =
-            `<div class="empty">No submission yet.</div>`;
-
+        gallery.innerHTML = `<div class="empty">No submission yet.</div>`;
         return;
     }
-
     images.forEach(function(item, index) {
-
-        const card =
-            document.createElement("div");
-
+        const card = document.createElement("div");
         card.className = "image-card";
-
-
-        const img =
-            document.createElement("img");
-
+        const img = document.createElement("img");
         img.src = item.image;
-
         img.alt = item.name;
-
-
-        const button =
-            document.createElement("button");
-
+        const button = document.createElement("button");
         button.className = "delete-btn";
-
         button.textContent = "DELETE";
-
         button.onclick = function() {
-
             deleteImage(index);
-
         };
-
-
         card.appendChild(img);
-
         card.appendChild(button);
-
         gallery.appendChild(card);
-
     });
-
 }
-
-
-// ========================================
-// DELETE IMAGE
-// ========================================
 
 function deleteImage(index) {
-
     const images = getImages();
-
     images.splice(index, 1);
-
     saveImages(images);
-
     displayImages();
-
 }
-
-
-// ========================================
-// CLEAR ALL UPLOADED IMAGES
-// ========================================
 
 function clearAll() {
-
     if (!confirm("Delete ALL quiz submissions?")) {
-
         return;
     }
-
     localStorage.removeItem(STORAGE_KEY);
-
     displayImages();
-
-    selectedFiles.textContent =
-        "No images selected.";
-
+    selectedFiles.textContent = "No images selected.";
 }
 
-
-// ========================================
-// LOAD SAVED IMAGES
-// ========================================
-
+// Load existing images on page load
 displayImages();
 
-
-// ========================================
-// GITHUB QUIZ SCREENSHOTS
-// ========================================
-
-const githubImageNames = [
-
-    "Screenshot 2026-10-06 201616.png",
-
-    "Screenshot 2026-10-06 201625.png",
-
-    "Screenshot 2026-10-06 201638.png"
+// --- Load images from your GitHub site ---
+const githubImageUrls = [
 
 ];
 
+const githubContainer = document.getElementById('github-images');
 
-const githubContainer =
-    document.getElementById("github-images");
-
-
-githubImageNames.forEach(function(fileName) {
-
-    const img =
-        document.createElement("img");
-
-
-    img.src =
-        "https://raw.githubusercontent.com/joaquimrojo21/PORTFOLIO/main/images/" +
-        encodeURIComponent(fileName);
-
-
-    img.alt = fileName;
-
+githubImageUrls.forEach(url => {
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = "Shared Image";
+    img.style.width = "200px"; // adjust size as needed
+    img.style.height = "auto";
+    img.style.borderRadius = "10px";
+    img.style.objectFit = "cover";
 
     githubContainer.appendChild(img);
-
 });
-
 </script>
 
 </body>
